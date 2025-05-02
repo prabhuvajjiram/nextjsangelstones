@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Layout from '@/components/layout/Layout';
-import HeroSection from '@/components/sections/HeroSection';
+import HeroSection from '@/components/sections/HeroSection'; 
 import AboutSection from '@/components/sections/AboutSection';
 import ProductsSection from '@/components/sections/ProductsSection';
 import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection';
 import ProjectsSection from '@/components/sections/ProjectsSection';
 import WhyChooseUsSection from '@/components/sections/WhyChooseUsSection';
-import ContactSection from '@/components/sections/ContactSection';
 import VarietySection from '@/components/sections/VarietySection';
-import dynamic from 'next/dynamic';
+import ContactSection from '@/components/sections/ContactSection';
 
 // Dynamically import the ProductModal component to avoid issues
 const ProductModal = dynamic(() => import('@/components/modals/ProductModal'), {
@@ -37,7 +37,7 @@ const convertToProductImage = (product: FeaturedProduct) => {
 export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
   const openProductModal = (product: FeaturedProduct) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
@@ -52,6 +52,7 @@ export default function Home() {
   return (
     <Layout>
       <main>
+        {/* Critical, above-fold content loaded immediately */}
         <HeroSection />
         <AboutSection />
         <ProductsSection />
@@ -61,6 +62,7 @@ export default function Home() {
         <VarietySection />
         <ContactSection />
 
+        {/* Modal only loads when needed */}
         {isModalOpen && selectedProduct && (
           <ProductModal 
             product={convertToProductImage(selectedProduct)} 

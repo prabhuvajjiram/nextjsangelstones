@@ -8,24 +8,22 @@ import path from 'path';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { category?: string | Promise<string> } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    // Handle params as a promise (Next.js 14+ behavior)
-    const categoryParam = params.category instanceof Promise 
-      ? await params.category 
-      : params.category;
+    // Await the params Promise to get the actual category value
+    const { category } = await params;
     
-    if (!categoryParam) {
+    if (!category) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
 
-    const category = categoryParam.trim();
+    const categoryValue = category.trim();
     const publicDir = path.join(process.cwd(), 'public');
     const imagesDir = path.join(publicDir, 'images');
     
     // The correct path is in products/{category}
-    const categoryDir = path.join(imagesDir, 'products', category);
+    const categoryDir = path.join(imagesDir, 'products', categoryValue);
 
     // Check if the directory exists
     if (!fs.existsSync(categoryDir)) {
@@ -45,7 +43,7 @@ export async function GET(
       })
       .map(file => {
         // Use forward slashes for web paths
-        const relativePath = path.join('products', category, file).replace(/\\/g, '/');
+        const relativePath = path.join('products', categoryValue, file).replace(/\\/g, '/');
         return {
           name: file,
           // Ensure the path uses forward slashes for web URLs

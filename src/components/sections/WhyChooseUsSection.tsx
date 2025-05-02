@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { memo, useMemo, useCallback } from 'react';
+import { handleImageError } from '@/utils/imageUtils';
 
 interface Reason {
   icon: string;
@@ -8,8 +10,10 @@ interface Reason {
   description: string;
 }
 
-const WhyChooseUsSection = () => {
-  const reasons: Reason[] = [
+// Memoize the entire component to prevent unnecessary re-renders
+export default memo(function WhyChooseUsSection() {
+  // Use useMemo for static data to prevent recreation on every render
+  const reasons: Reason[] = useMemo(() => [
     {
       icon: 'quality',
       title: 'Premium Quality',
@@ -40,10 +44,10 @@ const WhyChooseUsSection = () => {
       title: 'Lifetime Warranty',
       description: 'We stand behind our work with a comprehensive warranty that covers craftsmanship and materials.'
     }
-  ];
+  ], []);
 
-  // Function to render the appropriate icon based on the icon name
-  const renderIcon = (iconName: string) => {
+  // Memoize the renderIcon function to prevent recreation on every render
+  const renderIcon = useCallback((iconName: string) => {
     switch (iconName) {
       case 'quality':
         return (
@@ -88,7 +92,65 @@ const WhyChooseUsSection = () => {
           </svg>
         );
     }
-  };
+  }, []);
+
+  // Memoize the reasons grid to prevent recreation on each render
+  const reasonsGrid = useMemo(() => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {reasons.map((reason, index) => (
+        <div 
+          key={index}
+          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col items-center text-center"
+        >
+          <div className="mb-4">
+            {renderIcon(reason.icon)}
+          </div>
+          <h3 className="text-xl font-bold mb-3">{reason.title}</h3>
+          <p className="text-gray-600">{reason.description}</p>
+        </div>
+      ))}
+    </div>
+  ), [reasons, renderIcon]);
+
+  // Memoize the commitment section to prevent recreation on each render
+  const commitmentSection = useMemo(() => (
+    <div className="mt-16 bg-white rounded-lg shadow-xl overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="p-8 md:p-12 flex flex-col justify-center">
+          <h3 className="text-2xl md:text-3xl font-playfair mb-4">Our Commitment to Excellence</h3>
+          <p className="text-gray-600 mb-6">
+            At Angel Granites, we understand that creating a memorial is a deeply personal experience. Our team is dedicated to providing exceptional service and superior craftsmanship, ensuring that each monument we create is a fitting tribute to your loved one.
+          </p>
+          <p className="text-gray-600 mb-6">
+            From the initial consultation to the final installation, we work closely with you to create a memorial that captures the essence of the person it honors. Our attention to detail and commitment to quality are evident in every piece we create.
+          </p>
+          <div className="flex items-center mt-4">
+            <Image 
+              src="/images/signature.png" 
+              alt="Founder's Signature" 
+              width={150} 
+              height={60}
+              className="h-12 w-auto mr-4"
+              loading="lazy"
+              sizes="150px"
+              onError={handleImageError}
+            />
+          </div>
+        </div>
+        <div className="relative h-64 md:h-auto">
+          <Image
+            src="/images/workshop.jpg"
+            alt="Angel Granites Workshop"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            loading="lazy"
+            onError={handleImageError}
+          />
+        </div>
+      </div>
+    </div>
+  ), []);
 
   return (
     <section id="why-choose-as" className="py-20 bg-gray-50 relative overflow-hidden">
@@ -109,59 +171,9 @@ const WhyChooseUsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reasons.map((reason, index) => (
-            <div 
-              key={index}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col items-center text-center"
-            >
-              <div className="mb-4">
-                {renderIcon(reason.icon)}
-              </div>
-              <h3 className="text-xl font-bold mb-3">{reason.title}</h3>
-              <p className="text-gray-600">{reason.description}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-16 bg-white rounded-lg shadow-xl overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <div className="p-8 md:p-12 flex flex-col justify-center">
-              <h3 className="text-2xl md:text-3xl font-playfair mb-4">Our Commitment to Excellence</h3>
-              <p className="text-gray-600 mb-6">
-                At Angel Granites, we understand that creating a memorial is a deeply personal experience. Our team is dedicated to providing exceptional service and superior craftsmanship, ensuring that each monument we create is a fitting tribute to your loved one.
-              </p>
-              <p className="text-gray-600 mb-6">
-                From the initial consultation to the final installation, we work closely with you to create a memorial that captures the essence of the person it honors. Our attention to detail and commitment to quality are evident in every piece we create.
-              </p>
-              <div className="flex items-center mt-4">
-                <Image 
-                  src="/images/signature.png" 
-                  alt="Founder's Signature" 
-                  width={150} 
-                  height={60}
-                  className="h-12 w-auto mr-4"
-                />
-                <div>
-                  <p className="font-bold">David Anderson</p>
-                  <p className="text-sm text-gray-500">Founder, Angel Granites</p>
-                </div>
-              </div>
-            </div>
-            <div className="relative h-64 md:h-auto">
-              <Image
-                src="/images/workshop.jpg"
-                alt="Angel Granites Workshop"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          </div>
-        </div>
+        {reasonsGrid}
+        {commitmentSection}
       </div>
     </section>
   );
-};
-
-export default WhyChooseUsSection;
+});

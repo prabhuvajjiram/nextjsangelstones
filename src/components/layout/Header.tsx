@@ -1,45 +1,68 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import SearchBar from '@/components/search/SearchBar';
 
-export default function Header() {
+// Memoize the Header to prevent unnecessary re-renders
+export default memo(function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isPromotionVisible, setIsPromotionVisible] = useState(true);
   const [isClient, setIsClient] = useState(false);
 
+  // Optimize scroll handler with throttling
   useEffect(() => {
     setIsClient(true);
     
+    let lastScrollY = 0;
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(currentScrollY > 50);
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-    // Prevent body scrolling when menu is open
-    document.body.style.overflow = !isMenuOpen ? 'hidden' : '';
-  };
+  // Memoize event handlers
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prevState => !prevState);
+    if (!isMenuOpen) {
+      // Wait for animation to complete before adding overflow hidden
+      setTimeout(() => {
+        document.body.style.overflow = 'hidden';
+      }, 50);
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isMenuOpen]);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
     document.body.style.overflow = '';
-  };
+  }, []);
 
-  const minimizePromotion = () => {
+  const minimizePromotion = useCallback(() => {
     // Implement minimize functionality if needed
     console.log('Minimize promotion');
-  };
+  }, []);
 
-  const closePromotion = () => {
+  const closePromotion = useCallback(() => {
     setIsPromotionVisible(false);
-  };
+  }, []);
 
   // Server-side rendering version to avoid hydration mismatch
   if (!isClient) {
@@ -71,6 +94,17 @@ export default function Header() {
       </>
     );
   }
+
+  // Use render-targeted conditional classes
+  const headerClasses = `fixed top-0 left-0 w-full py-4 bg-black/80 z-[999] backdrop-blur-md transition-all duration-300 ${
+    isScrolled ? 'py-2 shadow-md' : ''
+  }`;
+
+  const menuClasses = `fixed inset-0 bg-black/80 z-[998] transition-opacity duration-300 ${
+    isMenuOpen 
+      ? 'opacity-100 visible' 
+      : 'opacity-0 invisible'
+  }`;
 
   return (
     <>
@@ -107,7 +141,7 @@ export default function Header() {
       )}
       
       {/* Header */}
-      <header className={`fixed top-0 left-0 w-full py-4 bg-black/80 z-[999] backdrop-blur-md transition-all duration-300 ${isScrolled ? 'py-2 shadow-md' : ''}`}>
+      <header className={headerClasses}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -119,6 +153,16 @@ export default function Header() {
                 className="h-[45px] w-auto"
               />
             </Link>
+
+            {/* Desktop Navigation Menu */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link href="/#home" className="text-white hover:text-primary transition-colors">Home</Link>
+              <Link href="/#our-product" className="text-white hover:text-primary transition-colors">Our Products</Link>
+              <Link href="/#featured-products" className="text-white hover:text-primary transition-colors">Featured Products</Link>
+              <Link href="/#projects" className="text-white hover:text-primary transition-colors">Projects</Link>
+              <Link href="/#why-choose-us" className="text-white hover:text-primary transition-colors">Why Choose Us</Link>
+              <Link href="/#get-in-touch" className="text-white hover:text-primary transition-colors">Contact</Link>
+            </nav>
             
             {/* Mobile Menu Toggle */}
             <button
@@ -131,8 +175,12 @@ export default function Header() {
               <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'}`}></span>
             </button>
             
-            {/* Phone Number */}
-            <div className="hidden md:flex items-center">
+            {/* Right Side Actions Group */}
+            <div className="hidden md:flex items-center space-x-4">
+              {/* Search Bar */}
+              <SearchBar />
+              
+              {/* Phone Number */}
               <a href="tel:1-800-123-4567" className="text-white hover:text-primary flex items-center space-x-2 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -146,7 +194,7 @@ export default function Header() {
       
       {/* Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/80 z-[998] transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        className={menuClasses}
         onClick={closeMenu}
       ></div>
       
@@ -165,12 +213,17 @@ export default function Header() {
         </div>
         
         <ul className="flex flex-col items-start space-y-6 px-8 py-8">
-          <li><Link href="#home" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Home</Link></li>
-          <li><Link href="#our-product" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Our Products</Link></li>
-          <li><Link href="#featured-products" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Featured Products</Link></li>
-          <li><Link href="#projects" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Projects</Link></li>
-          <li><Link href="#why-choose-us" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Why Choose Us</Link></li>
-          <li><Link href="#get-in-touch" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Contact</Link></li>
+          <li><Link href="/#home" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Home</Link></li>
+          <li><Link href="/#our-product" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Our Products</Link></li>
+          <li><Link href="/#featured-products" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Featured Products</Link></li>
+          <li><Link href="/#projects" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Projects</Link></li>
+          <li><Link href="/#why-choose-us" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Why Choose Us</Link></li>
+          <li><Link href="/#get-in-touch" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Contact</Link></li>
+          
+          {/* Mobile Search */}
+          <li className="w-full pt-4 border-t border-gray-700">
+            <SearchBar isExpandable={false} className="w-full" onClose={closeMenu} />
+          </li>
         </ul>
         
         <div className="mt-auto px-8 py-4 border-t border-gray-700">
@@ -181,4 +234,4 @@ export default function Header() {
       </nav>
     </>
   );
-}
+}) // Close the memo function parenthesis

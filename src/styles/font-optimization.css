@@ -1,0 +1,31 @@
+/* Font optimization strategies */
+
+/* 
+ * Note: We're using Next.js built-in font optimization with the next/font/google import
+ * This CSS file contains additional optimizations to reduce CLS (Cumulative Layout Shift)
+ * and improve text rendering
+ */
+
+/* Avoid layout shifts during font loading */
+html {
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Use CSS variables for font families */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, serif;
+  /* Size-adjust and line-gap properties reduce CLS */
+  font-size-adjust: 0.5;
+  font-synthesis: none;
+}
+
+p, div, span, button, input, select, textarea {
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Force text rendering optimization */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}

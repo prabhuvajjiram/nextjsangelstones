@@ -4,59 +4,114 @@
  */
 
 /**
- * Handles image loading errors by trying alternative paths and formats
- * @param img The image element that failed to load
- * @param originalSrc The original source URL that failed
+ * Image optimization and handling utilities for better performance
  */
-export const handleImageError = (img: HTMLImageElement, originalSrc: string): void => {
-  console.log(`Image failed to load: ${originalSrc}`);
+
+/**
+ * Handle image errors by showing a fallback
+ * - Supports both React event style and direct element style for backward compatibility
+ */
+export const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event> | HTMLImageElement, originalSrc?: string): void => {
+  // Get the image element (supports both React event and direct element)
+  const imgElement = 'currentTarget' in e ? e.currentTarget : e;
   
-  // If the image already has a fallback src, don't try again to avoid infinite loops
-  if (img.dataset.fallbackAttempted === 'true') {
-    // Set a placeholder image as last resort
-    img.src = '/images/placeholder.jpg';
-    return;
-  }
+  // Get the original src if provided or from the element
+  const src = originalSrc || imgElement.src;
   
-  // Mark this image as having attempted a fallback
-  img.dataset.fallbackAttempted = 'true';
-  
-  // Try different strategies to find the image
-  
-  // 1. Try with a timestamp to bypass cache
-  if (!originalSrc.includes('timestamp')) {
-    const timestamp = Date.now();
-    const separator = originalSrc.includes('?') ? '&' : '?';
-    img.src = `${originalSrc}${separator}timestamp=${timestamp}`;
-    return;
-  }
-  
-  // 2. Try the API endpoint if it's a direct image path
-  if (originalSrc.startsWith('/images/') && !originalSrc.includes('/api/image')) {
-    const imagePath = originalSrc.replace('/images/', '');
-    img.src = `/api/image?path=${encodeURIComponent(imagePath)}`;
-    return;
-  }
-  
-  // 3. Try alternative file extensions
-  const extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
-  const currentExt = originalSrc.substring(originalSrc.lastIndexOf('.'));
-  
-  if (extensions.includes(currentExt.toLowerCase())) {
-    // Get base path without extension
-    const basePath = originalSrc.substring(0, originalSrc.lastIndexOf('.'));
+  // Display a fallback image
+  if (imgElement) {
+    // Set fallback logic
+    imgElement.src = '/images/placeholder.jpg';
+    imgElement.alt = 'Image not available';
+    imgElement.onerror = null; // Prevent infinite error loop
     
-    // Try each alternative extension
-    for (const ext of extensions) {
-      if (ext.toLowerCase() !== currentExt.toLowerCase()) {
-        img.src = `${basePath}${ext}`;
-        return;
-      }
-    }
+    console.warn(`Image failed to load: ${src}`);
+  }
+};
+
+/**
+ * Generates optimized image parameters for Next.js Image component
+ * @param src - The image source URL
+ * @param width - Desired width (optional)
+ * @param height - Desired height (optional)
+ * @param quality - Image quality percentage (1-100)
+ * @returns Object with optimized image parameters
+ */
+export const getOptimizedImageProps = (
+  src: string,
+  width?: number,
+  height?: number,
+  quality = 80
+) => {
+  // Handle different image types more efficiently
+  const isImportant = src.includes('featured') || src.includes('hero');
+  
+  return {
+    src,
+    width: width || undefined,
+    height: height || undefined,
+    quality: isImportant ? 85 : quality,
+    loading: isImportant ? 'eager' : 'lazy',
+    sizes: `(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw`,
+    placeholder: 'blur',
+    blurDataURL: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWVlZWUiLz48L3N2Zz4=',
+  };
+};
+
+/**
+ * Get responsive image sizes attribute
+ * Supports both old and new parameter types for backward compatibility
+ */
+export const getResponsiveSizes = (
+  type: 'product' | 'hero' | 'gallery' | 'featured' | 'thumbnail' | 'small' | 'medium' | 'large' = 'medium'
+): string => {
+  // Map for new style
+  const sizes = {
+    small: '(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw',
+    medium: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+    large: '(max-width: 768px) 100vw, 50vw',
+  };
+  
+  // Map for old style
+  const typeSizes = {
+    product: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw',
+    hero: '100vw',
+    gallery: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+    featured: '(max-width: 768px) 100vw, 50vw',
+    thumbnail: '(max-width: 640px) 25vw, 10vw',
+  };
+  
+  // Check if it's a new style or old style parameter
+  if (type in sizes) {
+    return sizes[type as 'small' | 'medium' | 'large'];
+  } else {
+    return typeSizes[type as 'product' | 'hero' | 'gallery' | 'featured' | 'thumbnail'] || 
+           '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'; // Default to medium
+  }
+};
+
+/**
+ * Check if an image should be prioritized for loading
+ * Based on viewport visibility or content importance
+ * @param imageSrc - Image source URL
+ * @param imageType - Context of the image usage
+ * @returns True if the image should be prioritized
+ */
+export const shouldPrioritizeImage = (
+  imageSrc: string,
+  imageType: 'product' | 'hero' | 'gallery' | 'featured' | 'thumbnail'
+): boolean => {
+  // Prioritize hero images, featured products and visible above-the-fold content
+  if (imageType === 'hero' || imageType === 'featured') {
+    return true;
   }
   
-  // 4. Last resort - use a placeholder
-  img.src = '/images/placeholder.jpg';
+  // Prioritize important products (could be extended with more business logic)
+  if (imageType === 'product' && imageSrc.includes('featured')) {
+    return true;
+  }
+  
+  return false;
 };
 
 /**

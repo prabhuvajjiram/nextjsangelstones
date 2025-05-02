@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
 
@@ -46,7 +46,7 @@ function getDirectoryFiles(directory: string) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Base directory for products (this will need to be adjusted based on your actual file structure)
   const baseDir = path.join(process.cwd(), 'public', 'images', 'products');
   

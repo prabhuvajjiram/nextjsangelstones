@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { handleImageError } from '@/utils/imageUtils';
@@ -20,7 +20,7 @@ interface CategoryParams {
   category: string;
 }
 
-export default function ProductCategoryPage({ params }: { params: CategoryParams | Promise<CategoryParams> }) {
+export default function ProductCategoryPage({ params }: { params: CategoryParams }) {
   const [products, setProducts] = useState<ProductImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +28,10 @@ export default function ProductCategoryPage({ params }: { params: CategoryParams
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-  // Properly unwrap params using React.use()
-  const unwrappedParams = use(params as any) as CategoryParams;
-  const category = unwrappedParams.category;
+  // Directly use the params in Next.js for server components
+  // This approach avoids the need for the use() hook
+  const category = params.category;
+  
   const categoryTitle = category.replace(/([A-Z])/g, ' $1').trim();
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export default function ProductCategoryPage({ params }: { params: CategoryParams
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, product.path)}
+                    onError={(e) => handleImageError(e.currentTarget, product.path)}
                   />
                 </div>
                 <div className="p-4">
