@@ -11,22 +11,42 @@
  * Handle image errors by showing a fallback
  * - Supports both React event style and direct element style for backward compatibility
  */
-export const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event> | HTMLImageElement, originalSrc?: string): void => {
-  // Get the image element (supports both React event and direct element)
-  const imgElement = 'currentTarget' in e ? e.currentTarget : e;
-  
-  // Get the original src if provided or from the element
-  const src = originalSrc || imgElement.src;
-  
-  // Display a fallback image
-  if (imgElement) {
-    // Set fallback logic
-    imgElement.src = '/images/placeholder.jpg';
-    imgElement.alt = 'Image not available';
-    imgElement.onerror = null; // Prevent infinite error loop
-    
-    console.warn(`Image failed to load: ${src}`);
+import { SyntheticEvent } from 'react';
+
+/**
+ * Handle image errors by showing a fallback
+ * @param e - The event object
+ */
+export const handleImageError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+  const img = e.currentTarget;
+  img.src = '/images/placeholder.jpg';
+  img.onerror = null;
+};
+
+/**
+ * Get the image path with /images/ prefix if not already present
+ * @param path - The image path
+ * @returns The image path with /images/ prefix
+ */
+export const getImagePath = (path: string): string => {
+  // Ensure path starts with /images/
+  if (!path.startsWith('/images/')) {
+    return `/images/${path}`;
   }
+  return path;
+};
+
+/**
+ * Validate if an image path is valid
+ * @param path - The image path to validate
+ * @returns True if the image path is valid, false otherwise
+ */
+export const isImageValid = (path: string): boolean => {
+  // Basic validation for image paths
+  if (!path) return false;
+  const validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif']; // Support all common image formats
+  const extension = path.split('.').pop()?.toLowerCase();
+  return validExtensions.includes(extension || '');
 };
 
 /**

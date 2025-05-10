@@ -8,13 +8,17 @@ import path from 'path';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ category: string }> }
+  { params }: { params: { category: string } } 
 ) {
   try {
-    // Await the params Promise to get the actual category value
-    const { category } = await params;
+    // Get the category value directly
+    const { category } = params;
+    
+    // Debug
+    console.log('API Route - Processing category:', category);
     
     if (!category) {
+      console.error('API Route - Category is required but was not provided');
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
 
@@ -24,15 +28,20 @@ export async function GET(
     
     // The correct path is in products/{category}
     const categoryDir = path.join(imagesDir, 'products', categoryValue);
+    console.log('API Route - Category directory path:', categoryDir);
 
     // Check if the directory exists
     if (!fs.existsSync(categoryDir)) {
-      console.error(`Category directory not found: ${categoryDir}`);
-      return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+      console.error(`API Route - Category directory not found: ${categoryDir}`);
+      return NextResponse.json({ 
+        error: 'Category not found',
+        searchedPath: categoryDir 
+      }, { status: 404 });
     }
 
     // Read the directory and get all image files
     const files = fs.readdirSync(categoryDir);
+    console.log(`API Route - Found ${files.length} files in category ${categoryValue}`);
     
     // Filter for image files and create response objects
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
@@ -50,10 +59,14 @@ export async function GET(
           path: `/images/${relativePath}`
         };
       });
-
+    
+    console.log(`API Route - Returning ${images.length} images for category ${categoryValue}`);
     return NextResponse.json({ images });
   } catch (error) {
-    console.error('Error fetching product images:', error);
-    return NextResponse.json({ error: 'Failed to fetch product images' }, { status: 500 });
+    console.error('API Route - Error fetching product images:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch product images',
+      message: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }

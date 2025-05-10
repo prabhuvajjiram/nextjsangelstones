@@ -168,6 +168,14 @@ const FeaturedProductsSection = ({ onProductClick }: FeaturedProductsSectionProp
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, product.thumbnail)}
+                    priority={parseInt(product.id) < 3} // Prioritize first two featured products
+                    quality={85}
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmYWZjIi8+PC9zdmc+"
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                    }}
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>

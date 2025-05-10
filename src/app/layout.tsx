@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next/types";
-import { Inter, Playfair_Display, Didact_Gothic } from "next/font/google";
+import { Inter, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import '../styles/font-optimization.css'; // Import font optimization CSS
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 // Import production optimizer - will auto-run in production mode
 import "@/utils/prodOptimizer.js";
 import PerformanceInit from "./performance-init";
@@ -12,20 +10,20 @@ import PerformanceInit from "./performance-init";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-playfair",
+  variable: "--font-display",
 });
 
-const didact = Didact_Gothic({
-  weight: "400",
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-didact",
+  variable: "--font-serif",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 // Define viewport configuration separately as per Next.js 14+ requirements
@@ -67,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${inter.variable} ${playfair.variable} ${didact.variable}`}>
+    <html lang="en" className={`scroll-smooth ${inter.variable} ${playfair.variable} ${cormorant.variable}`}>
       <head>
         {/* DNS Prefetch and Preconnect */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
@@ -97,7 +95,7 @@ export default function RootLayout({
           defer
         />
       </head>
-      <body suppressHydrationWarning={true} className="font-sans text-gray-800 antialiased">
+      <body suppressHydrationWarning={true} className="min-h-screen flex flex-col font-sans text-gray-800 antialiased">
         {/* Google Tag Manager (noscript) - moved inside PerformanceInit */}
         <noscript>
           <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-56P7KZDV"
@@ -106,11 +104,9 @@ export default function RootLayout({
         
         <PerformanceInit />
         
-        <Header />
-        <main>
+        <main className="flex-grow">
           {children}
         </main>
-        <Footer />
       </body>
     </html>
   );
