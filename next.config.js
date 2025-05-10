@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-  openAnalyzer: false  // Add this line to prevent auto-opening
+  openAnalyzer: false
 });
 
 const nextConfig = {
@@ -18,25 +18,27 @@ const nextConfig = {
     reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
   
-  // Enable image optimization
+  // Enable image optimization with proper configuration
   images: {
-    // Replace domains with remotePatterns
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
+        pathname: '/_next/**',
       },
       {
         protocol: 'https',
         hostname: 'angelgranites.com',
+        pathname: '/**',
       }
     ],
-    // Larger image sizes for product showcase
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    // Smaller image sizes for thumbnails and icons
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    // Optimize formats
-    formats: ['image/webp'],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'inline',
+    contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';",
   },
   
   // Enable performance optimizations
@@ -85,8 +87,37 @@ const nextConfig = {
     return [];
   },
 
-  // Configure webpack for better performance
-  webpack: (config, { dev, isServer }) => {
+  webpack(config, { dev, isServer }) {
+    // Add optimization for third-party modules
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+    };
+
+    // Add proper module resolution
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        path: false,
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    };
+
+    // Using Next.js built-in image optimization instead of image-webpack-loader
+
     // Only run in production builds
     if (!dev) {
       // Split large chunks for better loading
