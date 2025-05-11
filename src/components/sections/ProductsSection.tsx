@@ -151,9 +151,6 @@ const ProductsSection = () => {
           </>
         )}
       </div>
-      <div className="mt-16">
-        <ColorsSection />
-      </div>
     </section>
   );
 };
