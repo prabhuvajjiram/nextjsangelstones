@@ -1,164 +1,156 @@
 'use client';
 
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { handleImageError } from '@/utils/imageUtils';
 
-// Memoize the entire component to prevent unnecessary re-renders
-export default memo(function HeroSection() {
-  const [isClient, setIsClient] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+export default function HeroSection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const slides = [
+    {
+      image: '/images/hero/hero1.jpg',
+      title: 'TIMELESS ELEGANCE',
+      subtitle: 'Premium Granite Monuments',
+    },
+    {
+      image: '/images/hero/hero2.jpg',
+      title: 'CRAFTED PERFECTION',
+      subtitle: 'Exquisite Memorial Stones',
+    },
+    {
+      image: '/images/hero/hero3.jpg',
+      title: 'ENDURING LEGACY',
+      subtitle: 'Bespoke Headstone Designs',
+    },
+  ];
 
-  // Use a single effect for all client-side initializations
   useEffect(() => {
-    // Mark as client-side rendered
-    setIsClient(true);
-    
-    // Define video loading logic
-    const loadVideo = () => {
-      if (videoRef.current) {
-        // Add event listeners to handle video loading state
-        videoRef.current.addEventListener('loadeddata', () => {
-          setVideoLoaded(true);
-        });
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
-        // Attempt to play the video
-        videoRef.current.play().catch(error => {
-          console.error("Video autoplay failed:", error);
-          // Show the poster image as fallback
-          setVideoLoaded(false);
-        });
-      }
-    };
+  const handlePrev = useCallback(() => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  }, [slides.length]);
 
-    // Load video with requestIdleCallback to avoid blocking main thread
-    if ('requestIdleCallback' in window) {
-      // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
-      window.requestIdleCallback(loadVideo, { timeout: 2000 });
-    } else {
-      // Fallback for browsers without requestIdleCallback
-      setTimeout(loadVideo, 100);
-    }
-
-    // Cleanup function
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.removeEventListener('loadeddata', () => {
-          setVideoLoaded(true);
-        });
-      }
-    };
-  }, []);
-
-  // Statically define the section's content part to avoid re-renders
-  const heroContent = (
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4 z-20 callout">
-      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2">ANGEL GRANITES</h1>
-      <div className="text-xl md:text-2xl mb-2 established-by">Established by Angel Stones</div>
-      <div className="text-lg mb-4 tagline">Elevating granite, preserving memories</div>
-      <div className="text-base mb-8 desc">Exquisite Granite Monuments and others</div>
-      <Link 
-        href="#our-product" 
-        className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md font-medium transition-colors button"
-        aria-label="View all products"
-      >
-        VIEW ALL PRODUCTS
-      </Link>
-    </div>
-  );
-
-  // Statically define the scroll indicator to avoid re-renders
-  const scrollIndicator = (
-    <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 animate-bounce hidden md:block">
-      <Link 
-        href="/#who-we-are" 
-        className="text-white flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity"
-        aria-label="Scroll down to Who We Are section"
-      >
-        <span className="text-sm mb-2">Scroll Down</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
-      </Link>
-    </div>
-  );
-
-  // Server-side render and client hydration optimization
-  if (!isClient) {
-    return (
-      <section id="home" className="relative h-screen min-h-[480px] bg-secondary overflow-hidden hero-section">
-        {/* Optimized poster image for LCP */}
-        <div className="absolute inset-0">
-          <div className="relative h-full w-full">
-            <Image 
-              src="/images/video-poster.jpg"
-              alt="Angel Granites - Premium Monuments & Headstones"
-              fill
-              priority={true}
-              className="object-cover hero-image"
-              sizes="100vw"
-              fetchPriority="high"
-              onError={handleImageError}
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-          </div>
-        </div>
-        
-        {/* Content */}
-        {heroContent}
-      </section>
-    );
-  }
+  const handleNext = useCallback(() => {
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  }, [slides.length]);
 
   return (
-    <section id="home" className="relative h-screen min-h-[480px] bg-secondary overflow-hidden hero-section">
-      <div className="absolute inset-0">
-        {/* Video container with conditional display */}
-        <div className="relative h-full w-full">
-          {/* Picture element for responsive images */}
-          <div className={videoLoaded ? 'hidden' : 'block absolute inset-0'}>
-            <Image 
-              src="/images/video-poster.jpg"
-              alt="Angel Granites - Premium Monuments & Headstones"
-              fill
-              priority={true}
-              className="object-cover hero-image"
-              sizes="100vw"
-              fetchPriority="high"
-              onError={handleImageError}
-            />
+    <section className="relative h-screen w-full overflow-hidden bg-primary-900">
+      {/* Slides */}
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            currentSlide === index ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <Image
+            src={slide.image}
+            alt={slide.title}
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="object-cover"
+            style={{ 
+              objectPosition: 'center 30%',
+              transform: currentSlide === index ? 'scale(1.05)' : 'scale(1)',
+              transition: 'transform 8s ease-in-out'
+            }}
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+        </div>
+      ))}
+
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
+        <div className="container mx-auto max-w-4xl">
+          <div className="space-y-6">
+            <h3 className="font-serif text-sm tracking-widest uppercase text-accent-200 animate-slide-down">
+              ANGEL GRANITES
+            </h3>
+            <div className="luxury-divider mx-auto w-24"></div>
+            <h1 className="mt-4 font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-tight animate-fade-in">
+              {slides[currentSlide].title}
+            </h1>
+            <p className="mt-6 text-xl text-accent-100 animate-slide-up">
+              {slides[currentSlide].subtitle}
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link 
+                href="/products" 
+                className="btn btn-primary px-8 py-4"
+              >
+                View Our Collection
+              </Link>
+              <Link 
+                href="/contact" 
+                className="btn btn-outline border border-white text-white hover:bg-white hover:bg-opacity-10 px-8 py-4"
+              >
+                Get In Touch
+              </Link>
+            </div>
           </div>
-          
-          {/* Video background loaded with lower priority than critical content */}
-          <video
-            ref={videoRef}
-            className={`absolute inset-0 w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/images/video-poster.jpg"
-            preload="metadata"
-            aria-hidden="true"
-          >
-            <source src="/images/as.webm" type="video/webm" />
-            <source src="/images/as.mp4" type="video/mp4" />
-            {/* No text needed since we have the image fallback */}
-          </video>
-          
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         </div>
       </div>
-      
-      {/* Content */}
-      {heroContent}
-      
-      {/* Scroll Down Indicator */}
-      {scrollIndicator}
+
+      {/* Navigation */}
+      <div className="absolute bottom-10 left-0 right-0 flex justify-center space-x-8">
+        <button
+          onClick={handlePrev}
+          className="group p-2 text-white transition-colors hover:text-accent-300"
+          aria-label="Previous slide"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-8 w-8"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <div className="flex items-center space-x-3">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2 w-2 rounded-full ${
+                currentSlide === index ? 'bg-accent-300 w-4' : 'bg-white bg-opacity-50'
+              } transition-all duration-300`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={handleNext}
+          className="group p-2 text-white transition-colors hover:text-accent-300"
+          aria-label="Next slide"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-8 w-8"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+      </div>
     </section>
   );
-});
+}

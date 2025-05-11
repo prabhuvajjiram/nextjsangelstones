@@ -1,237 +1,240 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from '@/components/search/SearchBar';
+import { usePathname } from 'next/navigation';
 
-// Memoize the Header to prevent unnecessary re-renders
-export default memo(function Header() {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isPromotionVisible, setIsPromotionVisible] = useState(true);
-  const [isClient, setIsClient] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const pathname = usePathname();
 
-  // Optimize scroll handler with throttling
   useEffect(() => {
-    setIsClient(true);
-    
-    let lastScrollY = 0;
-    let ticking = false;
-
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(currentScrollY > 50);
-          lastScrollY = currentScrollY;
-          ticking = false;
-        });
-
-        ticking = true;
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Memoize event handlers
-  const toggleMenu = useCallback(() => {
-    setIsMenuOpen(prevState => !prevState);
-    if (!isMenuOpen) {
-      // Wait for animation to complete before adding overflow hidden
-      setTimeout(() => {
-        document.body.style.overflow = 'hidden';
-      }, 50);
-    } else {
-      document.body.style.overflow = '';
-    }
-  }, [isMenuOpen]);
-
-  const closeMenu = useCallback(() => {
+  useEffect(() => {
+    // Close menu when route changes
     setIsMenuOpen(false);
-    document.body.style.overflow = '';
-  }, []);
+    setSearchOpen(false);
+  }, [pathname]);
 
-  const minimizePromotion = useCallback(() => {
-    // Implement minimize functionality if needed
-    console.log('Minimize promotion');
-  }, []);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    // When opening the menu, ensure search is closed
+    if (!isMenuOpen) {
+      setSearchOpen(false);
+    }
+  };
 
-  const closePromotion = useCallback(() => {
-    setIsPromotionVisible(false);
-  }, []);
+  const toggleSearch = () => {
+    setSearchOpen(!searchOpen);
+    // When opening search, ensure menu is closed
+    if (!searchOpen) {
+      setIsMenuOpen(false);
+    }
+  };
 
-  // Server-side rendering version to avoid hydration mismatch
-  if (!isClient) {
-    return (
-      <>
-        {/* Promotion Banner */}
-        <div className="bg-secondary text-white text-center py-2 px-4 text-sm relative z-[1000]">
-          <div className="container mx-auto">
-            Special Offer: Free shipping on all orders over $1000. Call us!
-          </div>
-        </div>
-        
-        {/* Header */}
-        <header className="fixed top-0 left-0 w-full py-4 bg-black/80 z-[999] backdrop-blur-md">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center">
-                <Image 
-                  src="/images/ag_logo.svg" 
-                  alt="Angel Granites" 
-                  width={200} 
-                  height={80}
-                  className="h-[45px] w-auto"
-                />
-              </Link>
-            </div>
-          </div>
-        </header>
-      </>
-    );
-  }
+  // Define navigation links in one place for consistency
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/products', label: 'Products' },
+    { href: '/projects', label: 'Projects' },
+    { href: '/contact', label: 'Contact' },
+  ];
 
-  // Use render-targeted conditional classes
-  const headerClasses = `fixed top-0 left-0 w-full py-4 bg-black/80 z-[999] backdrop-blur-md transition-all duration-300 ${
-    isScrolled ? 'py-2 shadow-md' : ''
-  }`;
-
-  const menuClasses = `fixed inset-0 bg-black/80 z-[998] transition-opacity duration-300 ${
-    isMenuOpen 
-      ? 'opacity-100 visible' 
-      : 'opacity-0 invisible'
-  }`;
+  // Helper function to check if a link is active
+  const isLinkActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
-    <>
-      {/* Promotion Banner */}
-      {isPromotionVisible && (
-        <div className="bg-secondary text-white text-center py-2 px-4 text-sm relative z-[1000]">
-          <div className="container mx-auto flex justify-between items-center">
-            <div className="flex-1"></div>
-            <div className="flex-1">
-              Special Offer: Free shipping on all orders over $1000. Call us!
-            </div>
-            <div className="flex-1 flex justify-end">
-              <button 
-                onClick={minimizePromotion}
-                className="text-white mx-1 opacity-70 hover:opacity-100"
-                aria-label="Minimize promotion banner"
+    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white bg-opacity-95 shadow-luxury text-primary-900' : 'bg-transparent text-white'}`}>
+      <div className="container mx-auto py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="relative z-10 flex items-center">
+            <span className="font-serif text-2xl tracking-wide">
+              ANGEL
+              <span className="font-light"> GRANITES</span>
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-2">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href}
+                href={link.href} 
+                className={`nav-link ${isLinkActive(link.href) ? 'nav-link-active' : ''}`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-              <button 
-                onClick={closePromotion}
-                className="text-white mx-1 opacity-70 hover:opacity-100"
-                aria-label="Close promotion banner"
+                {link.label}
+              </Link>
+            ))}
+            <button 
+              onClick={toggleSearch}
+              className="px-4 py-2 text-current hover:text-accent-700 transition-colors"
+              aria-label="Search"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="w-5 h-5"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+            <button 
+              onClick={toggleSearch}
+              className="relative z-10 p-2 text-current"
+              aria-label="Search"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="w-5 h-5"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+            <button 
+              onClick={toggleMenu} 
+              className="relative z-10 p-2 text-current focus:outline-none" 
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-6 h-6"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-              </button>
+              ) : (
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-6 h-6"
+                >
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar (Appears on both mobile and desktop) */}
+        {searchOpen && (
+          <div className="absolute inset-x-0 top-0 bg-white shadow-luxury z-20 py-4 px-4 md:px-8 animate-fadeDown">
+            <div className="container mx-auto">
+              <div className="flex items-center justify-between">
+                <SearchBar onClose={() => setSearchOpen(false)} />
+                <button 
+                  onClick={() => setSearchOpen(false)}
+                  className="ml-4 text-gray-500 hover:text-accent-700"
+                  aria-label="Close search"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-6 w-6" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div
+          className="mobile-nav fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md text-white"
+          style={{ minHeight: '100vh' }}
+          aria-modal="true"
+          role="dialog"
+        >
+          {/* Logo at the top center */}
+          <Link href="/" className="absolute left-1/2 top-8 -translate-x-1/2 flex flex-col items-center z-10" onClick={() => setIsMenuOpen(false)}>
+            <Image src="/images/ag_logo.svg" alt="Angel Granites Logo" width={80} height={80} className="mb-4" priority />
+          </Link>
+          {/* Close button */}
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="absolute top-6 right-6 text-white hover:text-accent-300 text-3xl z-20 focus:outline-none"
+            aria-label="Close menu"
+          >
+            &times;
+          </button>
+          <nav className="flex flex-col items-center space-y-8 mt-36 mb-12 w-full">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`mobile-nav-link text-xl font-semibold tracking-wide py-2 px-6 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-700 ${isLinkActive(link.href) ? 'mobile-nav-link-active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          {/* Call-to-action button at the bottom */}
+          <div className="absolute bottom-10 left-0 w-full flex justify-center">
+            <Link
+              href="/contact"
+              className="bg-accent-700 hover:bg-accent-800 text-white text-base font-semibold py-3 px-10 rounded-full shadow-xl border border-accent-200/30 transition-colors duration-300"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       )}
-      
-      {/* Header */}
-      <header className={headerClasses}>
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <Image 
-                src="/images/ag_logo.svg" 
-                alt="Angel Granites" 
-                width={200} 
-                height={80}
-                className="h-[45px] w-auto"
-              />
-            </Link>
-
-            {/* Desktop Navigation Menu */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/#home" className="text-white hover:text-primary transition-colors">Home</Link>
-              <Link href="/#our-product" className="text-white hover:text-primary transition-colors">Our Products</Link>
-              <Link href="/#featured-products" className="text-white hover:text-primary transition-colors">Featured Products</Link>
-              <Link href="/#projects" className="text-white hover:text-primary transition-colors">Projects</Link>
-              <Link href="/#why-choose-us" className="text-white hover:text-primary transition-colors">Why Choose Us</Link>
-              <Link href="/#get-in-touch" className="text-white hover:text-primary transition-colors">Contact</Link>
-            </nav>
-            
-            {/* Mobile Menu Toggle */}
-            <button
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 relative z-50"
-              onClick={toggleMenu}
-              aria-label="Toggle navigation menu"
-            >
-              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1' : '-translate-y-1'}`}></span>
-              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
-              <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'}`}></span>
-            </button>
-            
-            {/* Right Side Actions Group */}
-            <div className="hidden md:flex items-center space-x-4">
-              {/* Search Bar */}
-              <SearchBar />
-              
-              {/* Phone Number */}
-              <a href="tel:1-800-123-4567" className="text-white hover:text-primary flex items-center space-x-2 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>1-800-123-4567</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      {/* Mobile Menu Overlay */}
-      <div 
-        className={menuClasses}
-        onClick={closeMenu}
-      ></div>
-      
-      {/* Mobile Navigation Menu */}
-      <nav className={`fixed top-0 right-0 h-screen w-[300px] bg-secondary z-[999] flex flex-col justify-center transform transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="px-8 py-4 border-b border-gray-700">
-          <Link href="/" onClick={closeMenu}>
-            <Image 
-              src="/images/ag_logo.svg" 
-              alt="Angel Granites" 
-              width={150} 
-              height={60}
-              className="h-auto w-full max-w-[150px]"
-            />
-          </Link>
-        </div>
-        
-        <ul className="flex flex-col items-start space-y-6 px-8 py-8">
-          <li><Link href="/#home" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Home</Link></li>
-          <li><Link href="/#our-product" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Our Products</Link></li>
-          <li><Link href="/#featured-products" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Featured Products</Link></li>
-          <li><Link href="/#projects" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Projects</Link></li>
-          <li><Link href="/#why-choose-us" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Why Choose Us</Link></li>
-          <li><Link href="/#get-in-touch" className="text-white text-xl py-3 hover:text-primary transition-colors" onClick={closeMenu}>Contact</Link></li>
-          
-          {/* Mobile Search */}
-          <li className="w-full pt-4 border-t border-gray-700">
-            <SearchBar isExpandable={false} className="w-full" onClose={closeMenu} />
-          </li>
-        </ul>
-        
-        <div className="mt-auto px-8 py-4 border-t border-gray-700">
-          <p className="text-gray-400 text-sm">
-            &copy; 2024 <a href="https://www.theangelstones.com/" className="text-primary hover:text-primary-dark">Angel Stones</a>. All Rights Reserved
-          </p>
-        </div>
-      </nav>
-    </>
+    </header>
   );
-}) // Close the memo function parenthesis
+}

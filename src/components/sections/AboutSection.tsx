@@ -1,115 +1,169 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
-const AboutSection = () => {
+export default function AboutSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (textRef.current) observer.observe(textRef.current);
+    if (imageRef.current) observer.observe(imageRef.current);
+
+    return () => {
+      if (textRef.current) observer.unobserve(textRef.current);
+      if (imageRef.current) observer.unobserve(imageRef.current);
+    };
+  }, []);
+
   return (
-    <section id="who-we-are" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          {/* Image Column */}
-          <div className="md:w-1/2 relative">
-            <div className="relative z-10">
-              <Image
-                src="/images/about-img.jpg"
-                alt="Angel Granites Workshop"
-                width={600}
-                height={450}
-                className="rounded-lg shadow-xl object-cover"
-              />
+    <section ref={sectionRef} className="section bg-white overflow-hidden relative">
+      {/* Background accent */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-subtle-gradient opacity-50"></div>
+      
+      <div className="container relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Text content */}
+          <div ref={textRef} className="reveal">
+            <h3 className="font-serif text-sm tracking-widest uppercase text-accent-700 mb-2">
+              Our Legacy
+            </h3>
+            <div className="luxury-divider w-24 mb-6"></div>
+            <h2 className="section-title">
+              Crafting Memories in Stone Since 1995
+            </h2>
+            <p className="text-primary-700 mb-6 leading-relaxed">
+              At Angel Granites, we believe that every memorial should be as unique as the life it commemorates. For over 25 years, our master artisans have been transforming the finest granite into lasting tributes that honor cherished memories.
+            </p>
+            <p className="text-primary-700 mb-8 leading-relaxed">
+              From traditional headstones to custom monuments, each piece we create reflects our commitment to exceptional craftsmanship and attention to detail. Our dedication to quality and personalized service has made us a trusted partner for families seeking to create meaningful memorials for their loved ones.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-accent-50 flex items-center justify-center flex-shrink-0">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-8 w-8 text-accent-700" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={1.5} 
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" 
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-serif text-primary-900">Premium Materials</h3>
+                  <p className="text-sm text-primary-600">Sourced from world-class quarries</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-accent-50 flex items-center justify-center flex-shrink-0">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-8 w-8 text-accent-700" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={1.5} 
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" 
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-serif text-primary-900">Custom Designs</h3>
+                  <p className="text-sm text-primary-600">Personalized for each family</p>
+                </div>
+              </div>
             </div>
-            <div className="absolute -bottom-6 -right-6 w-2/3 h-2/3 z-0">
-              <Image
-                src="/images/about-img2.jpg"
-                alt="Granite Detail"
-                width={400}
-                height={300}
-                className="rounded-lg shadow-xl object-cover"
-              />
-            </div>
-            <div className="absolute -top-6 -left-6 bg-primary w-20 h-20 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white font-playfair text-xl">25+</span>
-            </div>
-            <div className="absolute -top-6 -left-6 bg-primary/20 w-20 h-20 rounded-full animate-ping"></div>
+            
+            <Link href="/about" className="btn btn-text mt-8 inline-flex items-center gap-2">
+              Discover Our Story
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={1.5} 
+                  d="M14 5l7 7m0 0l-7 7m7-7H3" 
+                />
+              </svg>
+            </Link>
           </div>
           
-          {/* Content Column */}
-          <div className="md:w-1/2">
-            <div className="mb-4">
-              <span className="text-primary font-medium uppercase tracking-widest">Who We Are</span>
-              <h2 className="text-3xl md:text-4xl font-playfair mt-2 mb-6">
-                Crafting Timeless Memorials Since 1998
-              </h2>
-              <div className="w-20 h-1 bg-primary mb-6"></div>
-            </div>
-            
-            <p className="text-gray-700 mb-6">
-              Angel Granites, a venture of Angel Stones, is a premier manufacturer of granite monuments, headstones, and memorial stones. With over 25 years of experience, we have established ourselves as a trusted name in the memorial industry.
-            </p>
-            
-            <p className="text-gray-700 mb-6">
-              Our dedication to quality craftsmanship and attention to detail has made us the preferred choice for families seeking to honor their loved ones with dignified and lasting memorials. We combine traditional stoneworking techniques with modern technology to create monuments that stand the test of time.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="flex items-start">
-                <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+          {/* Image grid */}
+          <div ref={imageRef} className="reveal">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="aspect-square relative overflow-hidden shadow-luxury">
+                  <Image
+                    src="/images/about/craftsman.jpg"
+                    alt="Master craftsman working on granite"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Premium Quality</h3>
-                  <p className="text-gray-600">Finest granite sourced globally</p>
+                <div className="aspect-[4/3] relative overflow-hidden shadow-luxury">
+                  <Image
+                    src="/images/about/workshop.jpg"
+                    alt="Angel Granites workshop"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
               </div>
-              <div className="flex items-start">
-                <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              <div className="space-y-4 mt-8">
+                <div className="aspect-[3/4] relative overflow-hidden shadow-luxury">
+                  <Image
+                    src="/images/about/monument.jpg"
+                    alt="Finished granite monument"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Timely Delivery</h3>
-                  <p className="text-gray-600">Nationwide shipping services</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Expert Consultation</h3>
-                  <p className="text-gray-600">Personalized design assistance</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Flexible Payment</h3>
-                  <p className="text-gray-600">Multiple payment options</p>
+                <div className="aspect-square relative overflow-hidden shadow-luxury">
+                  <Image
+                    src="/images/about/materials.jpg"
+                    alt="Premium granite materials"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
               </div>
             </div>
-            
-            <Link 
-              href="/#get-in-touch" 
-              className="inline-block bg-primary hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-md transition-colors duration-300"
-            >
-              Contact Us
-            </Link>
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default AboutSection;
+}

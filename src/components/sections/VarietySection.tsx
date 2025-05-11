@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface GraniteVariety {
   id: number;
@@ -90,7 +90,7 @@ const VarietySection = () => {
   const onImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     const originalSrc = img.src;
-    handleImageError(img, originalSrc);
+    handleImageErrorUtil(e, originalSrc);
   };
 
   return (

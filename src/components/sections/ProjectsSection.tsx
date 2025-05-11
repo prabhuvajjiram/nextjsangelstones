@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface Project {
   id: number;
@@ -152,9 +152,9 @@ const ProjectsSection = () => {
                   src={project.image}
                   alt={project.title}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, project.image)}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  onError={(e) => handleImageErrorUtil(e, project.image)}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="bg-white text-primary p-3 rounded-full">
@@ -196,7 +196,7 @@ const ProjectsSection = () => {
                   fill
                   className="object-contain"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                  onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, selectedProject.image)}
+                  onError={(e) => handleImageErrorUtil(e, selectedProject.image)}
                 />
               </div>
               

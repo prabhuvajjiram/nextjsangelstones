@@ -1,206 +1,156 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { handleImageError } from '@/utils/imageUtils';
-import ProductCategoryPage from '../products/ProductCategoryPage';
-import dynamic from 'next/dynamic';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
+import ColorsSection from './ColorsSection';
 
-// Dynamically import the ProductModal component
-const ProductModal = dynamic(() => import('@/components/modals/ProductModal'), {
-  ssr: false,
-});
-
-interface ProductCategory {
+interface Product {
+  id: string;
   name: string;
-  path: string;
+  slug: string;
   thumbnail: string;
-  count: number;
-}
-
-interface ProductImage {
-  name: string;
+  description: string;
   path: string;
 }
 
 const ProductsSection = () => {
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // New state variables for product viewing
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<ProductImage | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const productRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
-        // Call the API to get product categories
+        setLoading(true);
         const response = await fetch('/api/products');
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch product categories');
+          throw new Error(`Error fetching products: ${response.status}`);
         }
+        
         const data = await response.json();
-        
-        setCategories(data);
-        setLoading(false);
+        setProducts(data);
       } catch (err) {
-        console.error('Error fetching product categories:', err);
+        console.error('Failed to fetch products:', err);
         setError('Failed to load product categories. Please try again later.');
+      } finally {
         setLoading(false);
-        
-        // Fallback to sample data if API fails
-        const sampleData: ProductCategory[] = [
-          {
-            name: 'Benches',
-            path: '/products/Benches',
-            thumbnail: '/images/products/Benches/thumbnail.jpg',
-            count: 8
-          },
-          {
-            name: 'Columbarium',
-            path: '/products/columbarium',
-            thumbnail: '/images/products/columbarium/thumbnail.jpg',
-            count: 12
-          },
-          {
-            name: 'Designs',
-            path: '/products/Designs',
-            thumbnail: '/images/products/Designs/thumbnail.jpg',
-            count: 24
-          },
-          {
-            name: 'MBNA 2025',
-            path: '/products/MBNA_2025',
-            thumbnail: '/images/products/MBNA_2025/thumbnail.jpg',
-            count: 15
-          },
-          {
-            name: 'Monuments',
-            path: '/products/Monuments',
-            thumbnail: '/images/products/Monuments/thumbnail.jpg',
-            count: 18
-          }
-        ];
-        
-        setTimeout(() => {
-          setCategories(sampleData);
-          setLoading(false);
-        }, 500);
       }
     };
 
-    fetchCategories();
+    fetchProducts();
   }, []);
 
-  // Function to handle opening a category
-  const handleCategoryClick = (category: ProductCategory) => {
-    setSelectedCategory(category.name);
-  };
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-  // Function to handle product click
-  const handleProductClick = (product: ProductImage) => {
-    setSelectedProduct(product);
-    setShowModal(true);
-    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-  };
+    productRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
 
-  // Function to close the product modal
-  const closeProductModal = () => {
-    setShowModal(false);
-    document.body.style.overflow = ''; // Re-enable scrolling
-  };
-
-  // Go back to categories view
-  const handleBackToCategories = () => {
-    setSelectedCategory(null);
-  };
+    return () => {
+      productRefs.current.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+    };
+  }, [products]);
 
   return (
-    <section id="our-product" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        {!selectedCategory ? (
-          // Category selection view
-          <>
-            <div className="text-center mb-16">
-              <span className="text-primary font-medium uppercase tracking-widest">Our Products</span>
-              <h2 className="text-3xl md:text-4xl font-playfair mt-2 mb-6">
-                Explore Our Granite Collections
-              </h2>
-              <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Discover our extensive range of premium granite products, each crafted with precision and care to create lasting memorials for your loved ones.
-              </p>
-            </div>
+    <section className="section bg-primary-50">
+      <div className="container">
+        <div className="text-center mb-16">
+          <h3 className="font-serif text-sm tracking-widest uppercase text-accent-700 mb-2">
+            Our Collection
+          </h3>
+          <div className="luxury-divider mx-auto w-24 mb-6"></div>
+          <h2 className="section-title">Premium Granite Categories</h2>
+          <p className="section-subtitle mx-auto">
+            Discover our wide range of premium granite categories, each offering unique beauty and quality for your special monuments.
+          </p>
+        </div>
 
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            ) : error ? (
-              <div className="text-center text-red-500 p-8 bg-red-50 rounded-lg">
-                <p>{error}</p>
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {categories.map((category, index) => (
-                  <div 
-                    key={index}
-                    className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                    onClick={() => handleCategoryClick(category)}
-                  >
-                    <div className="relative h-80 w-full overflow-hidden">
-                      <Image
-                        src={category.thumbnail}
-                        alt={category.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, category.thumbnail)}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-xl font-bold mb-1">{category.name}</h3>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm opacity-80">{category.count} Products</span>
-                        <span className="text-primary group-hover:translate-x-2 transition-transform duration-300">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="rounded-full bg-primary-200 h-12 w-12 mb-4"></div>
+              <div className="text-primary-400">Loading categories...</div>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-10">
+            <div className="text-accent-700 mb-4">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-12 w-12 mx-auto" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <p className="text-accent-600">{error}</p>
+          </div>
         ) : (
-          // Product category view with improved navigation
-          <ProductCategoryPage 
-            initialCategory={selectedCategory} 
-            onProductClick={handleProductClick}
-            onBackToCategories={handleBackToCategories}
-          />
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {products.map((product, index) => (
+                <div
+                  key={product.id || index}
+                  ref={el => { productRefs.current[index] = el; }}
+                  className="group relative overflow-hidden rounded-lg shadow-luxury transition-all duration-300 hover:scale-105"
+                >
+                  <Link href={product.path}>
+                    <div className="relative h-64 w-full">
+                      <Image
+                        src={product.thumbnail || '/images/placeholder.jpg'}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        quality={80}
+                        priority={index < 3}
+                        onError={(e) => handleImageErrorUtil(e, product.path)}
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                        }}
+                      />
+                    </div>
+                    <div className="p-6 bg-white">
+                      <h3 className="text-lg font-semibold group-hover:text-accent-700 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-600 mt-2 line-clamp-2">
+                        {product.description}
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+            <div className="mt-16">
+              <ColorsSection />
+            </div>
+          </>
         )}
       </div>
-
-      {/* Product Modal */}
-      {showModal && selectedProduct && (
-        <ProductModal
-          product={selectedProduct}
-          onClose={closeProductModal}
-        />
-      )}
     </section>
   );
 };

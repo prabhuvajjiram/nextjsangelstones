@@ -1,6 +1,6 @@
 # Angel Granites - Next.js Migration Plan
 
-This document outlines the step-by-step plan for migrating the Angel Granites website from its current PHP/HTML implementation to a modern Next.js application with Tailwind CSS.
+This document outlines the step-by-step plan for migrating the Angel Granites website from its current PHP/HTML implementation to a modern Next.js application with Tailwind CSS. inspried by https://capellahotels.com/en/capella-bangkok site
 
 ## Migration Overview
 
