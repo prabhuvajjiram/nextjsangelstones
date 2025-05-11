@@ -193,18 +193,45 @@ export default function Header() {
 
       {/* Mobile Navigation Menu */}
       {isMenuOpen && (
-        <div className="mobile-nav">
-          <div className="flex flex-col items-center space-y-6">
+        <div
+          className="mobile-nav fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md text-white"
+          style={{ minHeight: '100vh' }}
+          aria-modal="true"
+          role="dialog"
+        >
+          {/* Logo at the top center */}
+          <Link href="/" className="absolute left-1/2 top-8 -translate-x-1/2 flex flex-col items-center z-10" onClick={() => setIsMenuOpen(false)}>
+            <Image src="/images/ag_logo.svg" alt="Angel Granites Logo" width={80} height={80} className="mb-4" priority />
+          </Link>
+          {/* Close button */}
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="absolute top-6 right-6 text-white hover:text-accent-300 text-3xl z-20 focus:outline-none"
+            aria-label="Close menu"
+          >
+            &times;
+          </button>
+          <nav className="flex flex-col items-center space-y-8 mt-36 mb-12 w-full">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`mobile-nav-link ${isLinkActive(link.href) ? 'mobile-nav-link-active' : ''}`}
+                className={`mobile-nav-link text-xl font-semibold tracking-wide py-2 px-6 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-700 ${isLinkActive(link.href) ? 'mobile-nav-link-active' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
+          </nav>
+          {/* Call-to-action button at the bottom */}
+          <div className="absolute bottom-10 left-0 w-full flex justify-center">
+            <Link
+              href="/contact"
+              className="bg-accent-700 hover:bg-accent-800 text-white text-base font-semibold py-3 px-10 rounded-full shadow-xl border border-accent-200/30 transition-colors duration-300"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       )}
