@@ -169,7 +169,7 @@ export default function Header() {
           <div className="absolute inset-x-0 top-0 bg-white shadow-luxury z-20 py-4 px-4 md:px-8 animate-fadeDown">
             <div className="container mx-auto">
               <div className="flex items-center justify-between">
-                <SearchBar onSearch={() => setSearchOpen(false)} />
+                <SearchBar onClose={() => setSearchOpen(false)} />
                 <button 
                   onClick={() => setSearchOpen(false)}
                   className="ml-4 text-gray-500 hover:text-accent-700"

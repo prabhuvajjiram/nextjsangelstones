@@ -6,10 +6,8 @@ import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/sections/HeroSection'; 
 import AboutSection from '@/components/sections/AboutSection';
 import ProductsSection from '@/components/sections/ProductsSection';
-import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection';
 import ProjectsSection from '@/components/sections/ProjectsSection';
 import WhyChooseUsSection from '@/components/sections/WhyChooseUsSection';
-import VarietySection from '@/components/sections/VarietySection';
 import ContactSection from '@/components/sections/ContactSection';
 
 // Dynamically import the ProductModal component to avoid issues
@@ -56,10 +54,8 @@ export default function Home() {
         <HeroSection />
         <AboutSection />
         <ProductsSection />
-        <FeaturedProductsSection onProductClick={openProductModal} />
         <ProjectsSection />
         <WhyChooseUsSection />
-        <VarietySection />
         <ContactSection />
 
         {/* Modal only loads when needed */}

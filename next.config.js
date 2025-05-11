@@ -134,8 +134,8 @@ const nextConfig = {
   // Enable HTTP/2
   poweredByHeader: false,
   
-  // Output optimizations
-  output: 'standalone',
+  // Remove standalone output to allow using next start
+  // output: 'standalone',
 };
 
 module.exports = withBundleAnalyzer(nextConfig);

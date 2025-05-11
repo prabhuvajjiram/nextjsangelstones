@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { memo, useMemo, useCallback } from 'react';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface Reason {
   icon: string;
@@ -133,7 +133,7 @@ export default memo(function WhyChooseUsSection() {
               className="h-12 w-auto mr-4"
               loading="lazy"
               sizes="150px"
-              onError={handleImageError}
+              onError={(e) => handleImageErrorUtil(e)}
             />
           </div>
         </div>
@@ -145,7 +145,7 @@ export default memo(function WhyChooseUsSection() {
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
             loading="lazy"
-            onError={handleImageError}
+            onError={(e) => handleImageErrorUtil(e)}
           />
         </div>
       </div>

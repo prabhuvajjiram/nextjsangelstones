@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 import SearchBar from '@/components/search/SearchBar';
 
 interface ProductImage {
@@ -357,7 +357,7 @@ export default function ProductCategoryPage({
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, product.path)}
+                    onError={(e) => handleImageErrorUtil(e, product.path)}
                   />
                 </div>
                 <div className="p-4 bg-white">
@@ -559,7 +559,7 @@ export default function ProductCategoryPage({
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-110"
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, product.path)}
+                            onError={(e) => handleImageErrorUtil(e, product.path)}
                           />
                         </div>
                         <div className="p-2">

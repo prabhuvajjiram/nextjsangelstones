@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface Product {
   name: string;
@@ -107,7 +108,8 @@ export default function ProductDetailPage() {
   }, [category, productId, decodedProductId]);
 
   // Handle image loading error
-  const handleImageError = () => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    handleImageErrorUtil(e, product?.path);
     setError('Failed to load image');
   };
 

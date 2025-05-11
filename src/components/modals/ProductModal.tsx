@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface ProductImage {
   name: string;
@@ -106,7 +106,7 @@ export default function ProductModal({
                 fill
                 className="object-contain"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                onError={(e) => handleImageError(e.currentTarget, product.path)}
+                onError={(e) => handleImageErrorUtil(e, product.path)}
                 priority
                 quality={85}
                 placeholder="blur"

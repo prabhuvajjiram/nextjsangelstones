@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 import ColorsSection from './ColorsSection';
 
 interface Product {
@@ -112,8 +112,8 @@ const ProductsSection = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {products.map((product, index) => (
                 <div
-                  key={product.id}
-                  ref={(el) => (productRefs.current[index] = el)}
+                  key={product.id || index}
+                  ref={el => { productRefs.current[index] = el; }}
                   className="group relative overflow-hidden rounded-lg shadow-luxury transition-all duration-300 hover:scale-105"
                 >
                   <Link href={product.path}>
@@ -126,7 +126,7 @@ const ProductsSection = () => {
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         quality={80}
                         priority={index < 3}
-                        onError={(e) => handleImageError(e)}
+                        onError={(e) => handleImageErrorUtil(e, product.path)}
                         style={{
                           objectFit: 'cover',
                           objectPosition: 'center',

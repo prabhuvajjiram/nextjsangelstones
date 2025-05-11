@@ -16,9 +16,13 @@ import { SyntheticEvent } from 'react';
 /**
  * Handle image errors by showing a fallback
  * @param e - The event object
+ * @param originalPath - Optional original path for logging purposes
  */
-export const handleImageError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+export const handleImageError = (e: SyntheticEvent<HTMLImageElement, Event>, originalPath?: string) => {
   const img = e.currentTarget;
+  if (originalPath) {
+    console.error(`Failed to load image: ${originalPath}`);
+  }
   img.src = '/images/placeholder.jpg';
   img.onerror = null;
 };

@@ -1,7 +1,10 @@
+'use client';
+
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { formatCategoryName } from '@/utils/imageUtils';
 import dynamic from 'next/dynamic';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 // Dynamically import the modal to avoid SSR issues
 const ProductModal = dynamic(() => import('@/components/modals/ProductModal'), {
@@ -65,14 +68,6 @@ export default function ColorsSection() {
     setSelectedImage(null);
   };
 
-  const handleImageError = (imagePath: string) => {
-    console.error(`Error loading image: ${imagePath}`);
-    setImageErrors(prev => ({
-      ...prev,
-      [imagePath]: true
-    }));
-  };
-
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -106,7 +101,13 @@ export default function ColorsSection() {
                   placeholder="blur"
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+"
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  onError={() => handleImageError(image.path)}
+                  onError={(e) => {
+                    handleImageErrorUtil(e, image.path);
+                    setImageErrors(prev => ({
+                      ...prev,
+                      [image.path]: true
+                    }));
+                  }}
                   style={{ display: imageErrors[image.path] ? 'none' : 'block' }}
                 />
                 {imageErrors[image.path] && (

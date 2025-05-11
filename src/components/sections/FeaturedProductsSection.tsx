@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { handleImageError } from '@/utils/imageUtils';
+import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 import Link from 'next/link';
 
 interface FeaturedProduct {
@@ -167,7 +167,7 @@ const FeaturedProductsSection = ({ onProductClick }: FeaturedProductsSectionProp
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, product.thumbnail)}
+                    onError={(e) => handleImageErrorUtil(e, product.thumbnail)}
                     priority={parseInt(product.id) < 3} // Prioritize first two featured products
                     quality={85}
                     placeholder="blur"
@@ -216,7 +216,7 @@ const FeaturedProductsSection = ({ onProductClick }: FeaturedProductsSectionProp
                     fill
                     className="object-contain"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                    onError={(e) => handleImageError(e.currentTarget as HTMLImageElement, selectedProduct.fullImage)}
+                    onError={(e) => handleImageErrorUtil(e, selectedProduct.fullImage)}
                   />
                 </div>
                 
