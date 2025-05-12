@@ -43,8 +43,8 @@ const nextConfig = {
   
   // Enable performance optimizations
   experimental: {
-    // Improve bundle sizes
-    optimizePackageImports: ['@headlessui/react'],
+    // Enable newer React optimizations
+    optimizePackageImports: ['@headlessui/react']
   },
   
   // Configure headers for better security and performance
