@@ -16,33 +16,33 @@ export default memo(function WhyChooseUsSection() {
   const reasons: Reason[] = useMemo(() => [
     {
       icon: 'quality',
-      title: 'Premium Quality',
-      description: 'We use only the finest granite sourced from around the world, ensuring your memorial will stand the test of time.'
+      title: 'Quality Craftsmanship',
+      description: 'We carefully select quality granite for our monuments, creating pieces that honor your loved ones with dignity.'
     },
     {
       icon: 'customization',
       title: 'Custom Designs',
-      description: 'Our skilled artisans can create personalized designs that perfectly capture the essence and memory of your loved ones.'
+      description: 'Our skilled artisans create personalized designs that thoughtfully capture the memory of your loved ones.'
     },
     {
       icon: 'experience',
-      title: '25+ Years Experience',
-      description: 'With over two decades in the industry, we bring unmatched expertise and craftsmanship to every project.'
+      title: 'Years of Experience',
+      description: 'Our expertise in the monument industry enables us to provide guidance and quality workmanship for each project.'
     },
     {
       icon: 'support',
-      title: 'Compassionate Service',
-      description: 'We provide caring, respectful guidance through every step of the memorial selection and creation process.'
+      title: 'Respectful Service',
+      description: 'We provide caring guidance through every step of the memorial selection and creation process.'
     },
     {
       icon: 'delivery',
-      title: 'Nationwide Delivery',
-      description: 'We offer reliable shipping and installation services to cemeteries and memorial sites across the country.'
+      title: 'Reliable Delivery',
+      description: 'We coordinate shipping to cemeteries and memorial sites to help complete your memorial project.'
     },
     {
-      icon: 'warranty',
-      title: 'Lifetime Warranty',
-      description: 'We stand behind our work with a comprehensive warranty that covers craftsmanship and materials.'
+      icon: 'variety',
+      title: 'Wide Selection',
+      description: 'We offer a diverse range of granite colors and designs to help you find the perfect memorial option.'
     }
   ], []);
 
@@ -79,10 +79,10 @@ export default memo(function WhyChooseUsSection() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         );
-      case 'warranty':
+      case 'variety':
         return (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
         );
       default:
