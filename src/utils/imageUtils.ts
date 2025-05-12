@@ -164,7 +164,16 @@ export const getFullImageUrl = (category: string, filename: string): string => {
  * Creates a product object from a filename and category
  * Used for consistent product representation across the site
  */
-export const createProductFromFile = (filename: string, category: string, index: number): any => {
+// Define a proper product interface
+export interface Product {
+  id: string;
+  name: string;
+  thumbnail: string;
+  fullImage: string;
+  category: string;
+}
+
+export const createProductFromFile = (filename: string, category: string, index: number): Product => {
   return {
     id: `${category.toLowerCase()}-${index}`,
     name: formatProductName(filename),

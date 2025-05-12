@@ -55,7 +55,7 @@ export const DynamicProjectsSection = dynamic(
 );
 
 // Dynamic with custom suspense wrapper
-export function createDynamicComponent<T extends ComponentType<any>>(
+export function createDynamicComponent<T extends ComponentType<Record<string, unknown>>>(
   importFunc: () => Promise<{ default: T }>,
   LoadingComponent: React.FC = DefaultLoadingComponent,
   ssrEnabled = true
@@ -66,7 +66,7 @@ export function createDynamicComponent<T extends ComponentType<any>>(
   });
 
   // Return a component that handles its own suspense boundary
-  return (props: React.ComponentProps<T> & { fallback?: ReactNode }) => {
+  const DynamicWithSuspense = (props: React.ComponentProps<T> & { fallback?: ReactNode }) => {
     const { fallback = <LoadingComponent />, ...componentProps } = props;
     
     return (
@@ -75,4 +75,9 @@ export function createDynamicComponent<T extends ComponentType<any>>(
       </Suspense>
     );
   };
+
+  // Add display name to fix ESLint warning
+  DynamicWithSuspense.displayName = `DynamicWithSuspense(${importFunc.toString().split("'")[1] || 'Component'})`;   
+  
+  return DynamicWithSuspense;
 }

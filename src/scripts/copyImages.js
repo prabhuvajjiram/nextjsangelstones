@@ -3,7 +3,9 @@
  * This will maintain the same directory structure and image names
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
 
 // Define source and destination paths

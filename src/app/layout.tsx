@@ -5,6 +5,8 @@ import '../styles/font-optimization.css'; // Import font optimization CSS
 // Import production optimizer - will auto-run in production mode
 import "@/utils/prodOptimizer.js";
 import PerformanceInit from "./performance-init";
+// We no longer need Header here since we're using the Layout component
+// import Header from "@/components/layout/Header";
 
 // Font configuration
 const inter = Inter({

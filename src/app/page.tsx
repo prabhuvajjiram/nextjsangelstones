@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/sections/HeroSection'; 
@@ -33,14 +33,11 @@ const convertToProductImage = (product: FeaturedProduct) => {
 };
 
 export default function Home() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedProduct, setSelectedProduct] = useState<FeaturedProduct | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const openProductModal = (product: FeaturedProduct) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-    document.body.style.overflow = 'hidden';
-  };
+
+  // Product click handler removed - not currently used
 
   const closeProductModal = () => {
     setIsModalOpen(false);
@@ -52,11 +49,21 @@ export default function Home() {
       <main>
         {/* Critical, above-fold content loaded immediately */}
         <HeroSection />
-        <AboutSection />
-        <ProductsSection />
-        <ProjectsSection />
-        <WhyChooseUsSection />
-        <ContactSection />
+        <section id="about">
+          <AboutSection />
+        </section>
+        <section id="products">
+          <ProductsSection />
+        </section>
+        <section id="projects">
+          <ProjectsSection />
+        </section>
+        <section id="why-choose-us">
+          <WhyChooseUsSection />
+        </section>
+        <section id="contact">
+          <ContactSection />
+        </section>
 
         {/* Modal only loads when needed */}
         {isModalOpen && selectedProduct && (

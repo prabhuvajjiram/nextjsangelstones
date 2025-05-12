@@ -60,8 +60,11 @@ const ProductsSection = () => {
       if (ref) observer.observe(ref);
     });
 
+    // Create a copy of the refs array to use in cleanup
+    const currentRefs = [...productRefs.current];
+    
     return () => {
-      productRefs.current.forEach((ref) => {
+      currentRefs.forEach((ref) => {
         if (ref) observer.unobserve(ref);
       });
     };

@@ -2,7 +2,9 @@
  * Script to specifically copy project images from the original project
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
 
 // Define source and destination paths

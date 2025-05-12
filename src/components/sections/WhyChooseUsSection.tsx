@@ -167,7 +167,7 @@ export default memo(function WhyChooseUsSection() {
           </h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            When you choose Angel Granites, you're selecting a partner committed to honoring your loved ones with dignity and craftsmanship. Here's what sets us apart:
+            When you choose Angel Granites, you&apos;re selecting a partner committed to honoring your loved ones with dignity and craftsmanship. Here&apos;s what sets us apart:
           </p>
         </div>
 

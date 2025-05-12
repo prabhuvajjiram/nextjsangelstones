@@ -25,7 +25,7 @@ export default function PerformanceInit() {
       // Choose appropriate scheduling based on priority and available APIs
       if (hasIdleCallback && priority < 1) {
         // Low priority - wait for idle time
-        (window as any).requestIdleCallback(() => loadScript(), { timeout: 3000 });
+        (window as Window & { requestIdleCallback: (callback: () => void, options?: { timeout: number }) => number }).requestIdleCallback(() => loadScript(), { timeout: 3000 });
       } else if (hasRAF && priority >= 1) {
         // Higher priority - use next animation frame
         window.requestAnimationFrame(() => setTimeout(loadScript, 0));
@@ -57,7 +57,8 @@ export default function PerformanceInit() {
         });
         observer.observe({ entryTypes: ['longtask'] });
       }
-    } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
       console.debug('PerformanceObserver not supported');
     }
     

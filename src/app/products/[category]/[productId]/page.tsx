@@ -22,7 +22,7 @@ export default function ProductDetailPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  // State for active image index removed as it's not currently used
   
   // Refs for animation
   const imageRef = useRef<HTMLDivElement>(null);
@@ -46,18 +46,24 @@ export default function ProductDetailPage() {
       { threshold: 0.1 }
     );
 
+    // Store ref values that won't change during cleanup
+    const imageElement = imageRef.current;
+    const detailsElement = detailsRef.current;
+    const specsElement = specsRef.current;
+    const relatedElement = relatedRef.current;
+
     // Observe all refs
-    if (imageRef.current) observer.observe(imageRef.current);
-    if (detailsRef.current) observer.observe(detailsRef.current);
-    if (specsRef.current) observer.observe(specsRef.current);
-    if (relatedRef.current) observer.observe(relatedRef.current);
+    if (imageElement) observer.observe(imageElement);
+    if (detailsElement) observer.observe(detailsElement);
+    if (specsElement) observer.observe(specsElement);
+    if (relatedElement) observer.observe(relatedElement);
 
     return () => {
-      // Cleanup observer
-      if (imageRef.current) observer.unobserve(imageRef.current);
-      if (detailsRef.current) observer.unobserve(detailsRef.current);
-      if (specsRef.current) observer.unobserve(specsRef.current);
-      if (relatedRef.current) observer.unobserve(relatedRef.current);
+      // Cleanup observer using stored elements
+      if (imageElement) observer.unobserve(imageElement);
+      if (detailsElement) observer.unobserve(detailsElement);
+      if (specsElement) observer.unobserve(specsElement);
+      if (relatedElement) observer.unobserve(relatedElement);
     };
   }, []);
 

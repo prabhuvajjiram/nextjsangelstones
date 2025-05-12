@@ -87,7 +87,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
         });
         window.addEventListener('testPassive', null, opts);
         window.removeEventListener('testPassive', null, opts);
-      } catch (e) {}
+      } catch (e) { /* eslint-disable-line @typescript-eslint/no-unused-vars */ }
 
       // Override addEventListener to make all scroll/touch events passive by default
       if (supportsPassive) {
@@ -116,21 +116,26 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
 }
 
 // Exports a custom hook for React components that need reduced computation
-export const useLightComputation = (heavyFunction, deps) => {
-  // Skip heavy computation during server render
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  
-  // Use React.useMemo but ensure it doesn't run during hydration
+// Removed the 'deps' parameter since it's no longer needed
+export const useLightComputation = (heavyFunction) => {
+  // Always declare hooks at the top level
   const [isHydrating, setIsHydrating] = React.useState(true);
+  const isBrowser = typeof window !== 'undefined';
   
+  // Always call all hooks
   React.useEffect(() => {
-    setIsHydrating(false);
-  }, []);
+    if (isBrowser) {
+      setIsHydrating(false);
+    }
+  }, [isBrowser]);
   
+  // Simplified the dependency array to just use the required dependencies
   return React.useMemo(() => {
-    if (isHydrating) return null;
+    // Only execute the function in the browser and when not hydrating
+    if (!isBrowser || isHydrating) return null;
     return heavyFunction();
-  }, [isHydrating, ...(deps || [])]);
+  }, [isBrowser, isHydrating, heavyFunction]);
+  
+  // We've removed the comment about excluding deps since it's not needed anymore
+
 };

@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 interface ProductCategory {
   name: string;
@@ -29,7 +27,7 @@ export default function ProductCategoryNavigation({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const router = useRouter();
+  // Router removed as it's not currently used
 
   // Get current category index
   const currentCategoryIndex = categories.findIndex(cat => cat.name === activeCategory);
@@ -133,9 +131,9 @@ export default function ProductCategoryNavigation({
       <nav className="hidden md:flex items-center mb-6">
         <ol className="flex items-center text-sm">
           <li className="flex items-center">
-            <a href="/#our-product" className="text-primary hover:underline">
+            <Link href="/#our-product" className="text-primary hover:underline">
               Our Products
-            </a>
+            </Link>
             <span className="mx-2">/</span>
           </li>
           <li>
@@ -200,12 +198,12 @@ export default function ProductCategoryNavigation({
       {/* Horizontal scrollable tabs for mobile & tablet */}
       <div className="md:hidden mb-6">
         <div className="flex items-center mb-3">
-          <a href="/#our-product" className="flex items-center text-primary text-sm hover:underline">
+          <Link href="/#our-product" className="flex items-center text-primary text-sm hover:underline">
             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             All Categories
-          </a>
+          </Link>
         </div>
         
         <div className="category-tabs flex overflow-x-auto pb-2 -mx-2 px-2">

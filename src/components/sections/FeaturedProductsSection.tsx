@@ -43,7 +43,13 @@ const FeaturedProductsSection = ({ onProductClick }: FeaturedProductsSectionProp
         // Check if data has the expected structure
         if (data.images && Array.isArray(data.images)) {
           // Map API response to FeaturedProduct interface
-          const mappedProducts: FeaturedProduct[] = data.images.slice(0, 8).map((image: any, index: number) => ({
+          // Define the image structure from API
+          interface ProductImageResponse {
+            name: string;
+            path: string;
+          }
+          
+          const mappedProducts: FeaturedProduct[] = data.images.slice(0, 8).map((image: ProductImageResponse, index: number) => ({
             id: String(index + 1),
             name: image.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
             thumbnail: image.path,

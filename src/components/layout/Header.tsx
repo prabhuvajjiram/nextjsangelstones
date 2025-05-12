@@ -46,10 +46,10 @@ export default function Header() {
   // Define navigation links in one place for consistency
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/products', label: 'Products' },
-    { href: '/projects', label: 'Projects' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/#about', label: 'About' },
+    { href: '/#products', label: 'Products' },
+    { href: '/#projects', label: 'Projects' },
+    { href: '/#contact', label: 'Contact' },
   ];
 
   // Helper function to check if a link is active

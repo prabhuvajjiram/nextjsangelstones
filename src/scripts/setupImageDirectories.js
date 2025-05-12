@@ -3,7 +3,9 @@
  * This ensures we have the same structure as the original site for the "thumbnails-first" approach
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
 
 // Base directory for product images

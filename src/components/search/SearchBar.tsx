@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface SearchBarProps {
@@ -20,11 +19,17 @@ export default memo(function SearchBar({
   const [isOpen, setIsOpen] = useState(!isExpandable || false);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  // Define a proper type for search results
+  type SearchResult = {
+    name: string;
+    path: string;
+    category?: string;
+  };
+  const [results, setResults] = useState<SearchResult[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
+  // Router removed as it's not currently used
 
   // Handle click outside to close
   useEffect(() => {
@@ -47,32 +52,6 @@ export default memo(function SearchBar({
       inputRef.current.focus();
     }
   }, [isOpen]);
-
-  // Auto search when query changes (debounced)
-  useEffect(() => {
-    // Clear any existing timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    // Don't search if query is too short
-    if (!query || query.length < 2) {
-      setResults([]);
-      return;
-    }
-
-    // Debounce search (wait 300ms after typing stops)
-    searchTimeoutRef.current = setTimeout(() => {
-      performSearch(query);
-    }, 300);
-
-    // Cleanup
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [query]);
 
   // Memoize handlers to reduce function recreation
   const toggleSearch = useCallback(() => {
@@ -113,12 +92,40 @@ export default memo(function SearchBar({
     }
   }, []);
 
+  // Auto search when query changes (debounced)
+  useEffect(() => {
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Don't search if query is too short
+    if (!query || query.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    // Debounce search (wait 300ms after typing stops)
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+
+    // Cleanup
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query, performSearch]);
+
+
+
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     performSearch(query);
   }, [performSearch, query]);
 
-  const handleProductClick = useCallback((product: any) => {
+  const handleProductClick = useCallback((product: SearchResult) => {
     // Navigate to product or show in modal
     console.log('View product:', product);
     setIsOpen(false);
@@ -176,7 +183,7 @@ export default memo(function SearchBar({
       {results.length > 0 && (
         <div className={`absolute top-full left-0 right-0 mt-2 ${compact ? 'bg-white border-gray-300 text-gray-800' : 'bg-gray-800 border-gray-700 text-white'} border rounded shadow-lg z-50 max-h-96 overflow-y-auto`}>
           <div className="p-4">
-            <h3 className={`${compact ? 'text-gray-800' : 'text-white'} text-sm font-semibold mb-2`}>Found {results.length} results for "{query}"</h3>
+            <h3 className={`${compact ? 'text-gray-800' : 'text-white'} text-sm font-semibold mb-2`}>Found {results.length} results for &quot;{query}&quot;</h3>
             <div className="space-y-3">
               {results.map((product, index) => (
                 <div 

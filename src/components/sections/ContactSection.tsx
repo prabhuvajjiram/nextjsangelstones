@@ -77,13 +77,16 @@ export default function ContactSection() {
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    // Store ref value to prevent issues in cleanup function
+    const sectionElement = sectionRef.current;
+    
+    if (sectionElement) {
+      observer.observe(sectionElement);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (sectionElement) {
+        observer.unobserve(sectionElement);
       }
     };
   }, []);
@@ -100,7 +103,7 @@ export default function ContactSection() {
             Contact Angel Granites
           </h2>
           <p className="section-subtitle mx-auto">
-            We're here to assist you in creating a lasting memorial. Reach out to us with any questions or to schedule a consultation.
+            We&apos;re here to assist you in creating a lasting memorial. Reach out to us with any questions or to schedule a consultation.
           </p>
         </div>
 
@@ -229,13 +232,13 @@ export default function ContactSection() {
                 
                 {formStatus === 'success' && (
                   <div className="mt-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3">
-                    Thank you for your message. We'll get back to you shortly.
+                    Thank you for your message. We&apos;ll get back to you shortly.
                   </div>
                 )}
                 
                 {formStatus === 'error' && (
                   <div className="mt-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3">
-                    There was an error sending your message. Please try again later.
+                    There&#39;s no better way to honor your loved one&#39;s memory than with a beautifully crafted monument.
                   </div>
                 )}
               </div>
@@ -247,7 +250,7 @@ export default function ContactSection() {
             <div className="mb-8">
               <h3 className="text-2xl font-serif mb-6">Contact Information</h3>
               <p className="text-primary-700 mb-8">
-                We'd love to hear from you. Visit our showroom, call us directly, or fill out the contact form.
+                We&apos;d love to hear from you. Visit our showroom, call us directly, or fill out the contact form.
               </p>
               
               <div className="space-y-6">

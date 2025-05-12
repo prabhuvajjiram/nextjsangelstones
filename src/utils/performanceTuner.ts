@@ -19,7 +19,7 @@ export const monitorLongTasks = () => {
     
     longTaskObserver.observe({ entryTypes: ['longtask'] });
     return longTaskObserver; // Return for cleanup
-  } catch (e) {
+  } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
     console.debug('LongTask observer not supported in this browser');
     return null;
   }
@@ -27,7 +27,7 @@ export const monitorLongTasks = () => {
 
 // Advanced event throttling beyond requestAnimationFrame
 // This is more aggressive than standard throttling to reduce main thread work
-export const createSuperThrottledCallback = <T extends (...args: any[]) => any>(
+export const createSuperThrottledCallback = <T extends (...args: unknown[]) => unknown>(
   callback: T,
   minTimeBetweenCalls = 150,
 ) => {
@@ -82,7 +82,7 @@ export const addPassiveEventListener = (
     
     // Return a cleanup function
     return () => element.removeEventListener(eventName, handler);
-  } catch (e) {
+  } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Fallback for older browsers - extract just the capture property for boolean parameter
     const useCapture = options.capture ?? false;
     element.addEventListener(eventName, handler, useCapture);

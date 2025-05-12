@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run clean && next build --no-lint",
+    "build": "npm run clean && next build",
     "start": "next start",
     "lint": "next lint",
     "dev:prod": "cross-env NODE_ENV=production next dev",

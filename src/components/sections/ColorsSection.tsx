@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { formatCategoryName } from '@/utils/imageUtils';
+// import formatCategoryName removed as it's not used
 import dynamic from 'next/dynamic';
 import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -22,7 +22,8 @@ interface ColorImage {
   category: string;
 }
 
-const colorImagesData: ColorImage[] = [
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const colorSamples: ColorImage[] = [
   { name: 'Bahama Blue', path: 'Bahama-Blue.jpg', category: 'colors' },
   { name: 'Jet Black', path: 'Jet-Black.jpg', category: 'colors' },
   { name: 'NH Red', path: 'NH-Red.jpg', category: 'colors' },
