@@ -137,7 +137,7 @@ export default function AboutSection() {
               <div className="space-y-4">
                 <div className="aspect-square relative overflow-hidden shadow-luxury">
                   <Image
-                    src="/images/about/craftsman.jpg"
+                    src="/images/monumentcross.png"
                     alt="Master craftsman working on granite"
                     fill
                     className="object-cover"
@@ -146,7 +146,7 @@ export default function AboutSection() {
                 </div>
                 <div className="aspect-[4/3] relative overflow-hidden shadow-luxury">
                   <Image
-                    src="/images/about/workshop.jpg"
+                    src="/images/workshop.jpg"
                     alt="Angel Granites workshop"
                     fill
                     className="object-cover"
@@ -157,7 +157,7 @@ export default function AboutSection() {
               <div className="space-y-4 mt-8">
                 <div className="aspect-[3/4] relative overflow-hidden shadow-luxury">
                   <Image
-                    src="/images/about/monument.jpg"
+                    src="/images/memorials.png"
                     alt="Finished granite monument"
                     fill
                     className="object-cover"
@@ -166,7 +166,7 @@ export default function AboutSection() {
                 </div>
                 <div className="aspect-square relative overflow-hidden shadow-luxury">
                   <Image
-                    src="/images/about/materials.jpg"
+                    src="/images/Factory-768.webp"
                     alt="Premium granite materials"
                     fill
                     className="object-cover"

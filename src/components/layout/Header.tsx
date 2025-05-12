@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import SearchBar from '@/components/search/SearchBar';
 import { usePathname } from 'next/navigation';
+import SearchBar from '@/components/search/SearchBar';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,12 +64,28 @@ export default function Header() {
     <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white bg-opacity-95 shadow-luxury text-primary-900' : 'bg-transparent text-white'}`}>
       <div className="container mx-auto py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo - Displays either light or dark version based on scroll state */}
           <Link href="/" className="relative z-10 flex items-center">
-            <span className="font-serif text-2xl tracking-wide">
-              ANGEL
-              <span className="font-light"> GRANITES</span>
-            </span>
+            <div className="relative" style={{ width: '150px', height: '60px' }}>
+              {/* Light logo for transparent background when not scrolled */}
+              <Image 
+                src="/images/Angel Granites Logo.svg" 
+                alt="Angel Granites" 
+                fill
+                sizes="150px"
+                className={`object-contain transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}
+                priority
+              />
+              {/* Dark logo for white background when scrolled */}
+              <Image 
+                src="/images/Angel Granites Logo.svg" 
+                alt="Angel Granites" 
+                fill
+                sizes="150px"
+                className={`object-contain transition-opacity duration-300 filter ${isScrolled ? 'opacity-100 invert-0' : 'opacity-0 invert'}`}
+                priority
+              />
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

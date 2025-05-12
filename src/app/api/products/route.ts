@@ -30,10 +30,7 @@ function getDirectoryFiles(directory: string) {
           path: `/products/${dir.name}`,
           count: files.length,
           thumbnail: files.length > 0 
-            ? `/api/image?path=${encodeURIComponent(path.join(dir.name, files[0]))}&timestamp=${
-                // Special handling for MBNA_2025 category (no cache busting)
-                dir.name === 'MBNA_2025' ? '' : Date.now()
-              }`
+            ? `/api/image?path=${encodeURIComponent(path.join(dir.name, files[0]))}&timestamp=${Date.now()}`
             : null
         };
       })
