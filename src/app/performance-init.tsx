@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { preloadCriticalAssets } from '@/utils/performanceUtils';
 
 /**
  * Performance initialization component that safely defers third-party scripts
@@ -9,6 +10,7 @@ import { useEffect } from 'react';
  */
 export default function PerformanceInit() {
   useEffect(() => {
+    preloadCriticalAssets();
     // Safe feature detection
     const hasIdleCallback = typeof window !== 'undefined' && 'requestIdleCallback' in window;
     const hasRAF = typeof window !== 'undefined' && 'requestAnimationFrame' in window;

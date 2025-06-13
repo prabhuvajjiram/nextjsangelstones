@@ -7,11 +7,9 @@ export const preloadCriticalAssets = () => {
   if (typeof window === 'undefined') return;
   
   const preloadLinks = [
-    // Preload critical fonts
-    { rel: 'preload', href: '/fonts/playfair-display.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
     // Preload critical images (hero image, logo)
     { rel: 'preload', href: '/images/logo.png', as: 'image' },
-    { rel: 'preload', href: '/images/hero.jpg', as: 'image' },
+    { rel: 'preload', href: '/images/video-poster-optimized.jpg', as: 'image' },
   ];
   
   preloadLinks.forEach(link => {

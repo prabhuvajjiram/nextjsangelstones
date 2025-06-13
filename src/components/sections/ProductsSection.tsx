@@ -4,7 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
-import ColorsSection from './ColorsSection';
+import dynamic from 'next/dynamic';
+
+const LazyColorsSection = dynamic(() => import('./ColorsSection'), {
+  ssr: false,
+});
 
 interface Product {
   id: string;
@@ -20,6 +24,8 @@ const ProductsSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const productRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [showColors, setShowColors] = useState(false);
+  const colorsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -69,6 +75,24 @@ const ProductsSection = () => {
       });
     };
   }, [products]);
+
+  useEffect(() => {
+    if (!colorsRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowColors(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(colorsRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section className="section bg-primary-50">
@@ -148,8 +172,8 @@ const ProductsSection = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-16">
-              <ColorsSection />
+            <div className="mt-16" ref={colorsRef}>
+              {showColors && <LazyColorsSection />}
             </div>
           </>
         )}

@@ -73,6 +73,7 @@ export default function RootLayout({
         
         {/* Preload Critical Assets */}
         <link rel="preload" href="/images/logo.png" as="image" />
+        <link rel="preload" href="/images/video-poster-optimized.jpg" as="image" />
         
         {/* Critical CSS */}
         <style dangerouslySetInnerHTML={{ __html: `
