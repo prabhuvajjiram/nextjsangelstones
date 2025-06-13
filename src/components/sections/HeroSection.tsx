@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function HeroSection() {
   // Using a state to track if video has loaded
@@ -29,21 +28,12 @@ export default function HeroSection() {
           muted
           loop
           playsInline
+          poster="/images/video-poster-optimized.jpg"
           className={`object-cover w-full h-full transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
           style={{ objectPosition: 'center center' }}
           onLoadedData={handleVideoLoaded}
         >
           <source src="/images/as.webm" type="video/webm" />
-          {/* Fallback image if video cannot be played */}
-          <Image
-            src="/images/hero/hero1.jpg"
-            alt="Angel Granites Hero"
-            fill
-            priority
-            quality={90}
-            sizes="100vw"
-            className="object-cover"
-          />
         </video>
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>

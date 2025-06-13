@@ -127,15 +127,14 @@ export default function ColorsSection() {
               {colorImages.map((image, index) => (
                 <SwiperSlide key={index}>
                   <div
-                    className="group relative overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+                    className="group relative overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer aspect-[4/3]"
                     onClick={() => handleImageClick(image)}
                   >
                     <Image
                       src={`/images/colors/${image.path}`}
                       alt={image.name}
-                      width={400}
-                      height={300}
-                      className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
+                      fill
+                      className="object-cover w-full h-full transition-opacity duration-300 group-hover:opacity-75"
                       priority={index < 2}
                       quality={85}
                       placeholder="blur"

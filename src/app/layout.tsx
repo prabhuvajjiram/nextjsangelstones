@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next/types";
-import { Inter, Playfair_Display, Cormorant_Garamond } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import '../styles/font-optimization.css'; // Import font optimization CSS
 // Import production optimizer - will auto-run in production mode
@@ -9,23 +9,22 @@ import PerformanceInit from "./performance-init";
 // import Header from "@/components/layout/Header";
 
 // Font configuration
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2",
   display: "swap",
   variable: "--font-sans",
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
+const playfair = localFont({
+  src: "../../node_modules/@fontsource/playfair-display/files/playfair-display-latin-400-normal.woff2",
   display: "swap",
   variable: "--font-display",
 });
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
+const cormorant = localFont({
+  src: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2",
   display: "swap",
   variable: "--font-serif",
-  weight: ["300", "400", "500", "600", "700"],
 });
 
 // Define viewport configuration separately as per Next.js 14+ requirements
@@ -70,13 +69,11 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${inter.variable} ${playfair.variable} ${cormorant.variable}`}>
       <head>
         {/* DNS Prefetch and Preconnect */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
         {/* Preload Critical Assets */}
         <link rel="preload" href="/images/logo.png" as="image" />
+        <link rel="preload" href="/images/video-poster-optimized.jpg" as="image" />
         
         {/* Critical CSS */}
         <style dangerouslySetInnerHTML={{ __html: `
