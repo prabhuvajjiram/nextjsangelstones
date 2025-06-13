@@ -14,8 +14,9 @@ export default function ProductsPage() {
   const categories = [
     { id: 'Monuments', name: 'Monuments' },
     { id: 'Designs', name: 'Designs' },
-    { id: 'Slabs', name: 'Slabs' },
-    { id: 'Columbarium', name: 'Columbarium' },
+    { id: 'Benches', name: 'Benches' },
+    { id: 'columbarium', name: 'Columbarium' },
+    { id: 'MBNA_2025', name: 'MBNA 2025' },
   ];
 
   // Server-side rendering version to avoid hydration mismatch
