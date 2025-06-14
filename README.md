@@ -25,6 +25,9 @@ Angel Granites is a leading granite monument manufacturer offering custom headst
 - **Form Handling**: React Hook Form with Zod validation
 - **Email**: Nodemailer with SMTP authentication
 
+##Future Plan,
+## Try with STAPI 
+
 ## Getting Started
 
 ### Prerequisites
