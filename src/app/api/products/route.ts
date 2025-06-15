@@ -1,57 +1,33 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
-
-// Function to get directory files (similar to the PHP implementation)
-function getDirectoryFiles(directory: string) {
-  try {
-    // Check if the directory exists
-    if (!fs.existsSync(directory)) {
-      return { error: 'Directory not found' };
-    }
-
-    // Get all files and directories
-    const items = fs.readdirSync(directory, { withFileTypes: true });
-    
-    // Filter directories only
-    const directories = items
-      .filter(item => item.isDirectory())
-      .map(dir => {
-        const dirPath = path.join(directory, dir.name);
-        const files = fs.readdirSync(dirPath)
-          .filter(file => {
-            // Filter image files only
-            const ext = path.extname(file).toLowerCase();
-            return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
-          });
-        
-        return {
-          name: dir.name,
-          path: `/products/${dir.name}`,
-          count: files.length,
-          thumbnail: files.length > 0 
-            ? `/api/image?path=${encodeURIComponent(path.join(dir.name, files[0]))}&timestamp=${Date.now()}`
-            : null
-        };
-      })
-      .filter(dir => dir.count > 0); // Only include directories with images
-    
-    return { directories };
-  } catch (error) {
-    console.error('Error reading directory:', error);
-    return { error: 'Failed to read directory' };
-  }
-}
+import { strapi } from '@/lib/strapi';
 
 export async function GET() {
-  // Base directory for products (this will need to be adjusted based on your actual file structure)
-  const baseDir = path.join(process.cwd(), 'public', 'images', 'products');
-  
-  const result = getDirectoryFiles(baseDir);
-  
-  if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 404 });
+  try {
+    // Fetch product categories from Strapi
+    const categories = await strapi.getProductCategories();
+    
+    // Transform to match the expected format for your frontend
+    const formattedCategories = categories.map(category => ({
+      name: category.name,
+      slug: category.slug,
+      description: strapi.richTextToPlainText(category.description),
+      featured: category.featured,
+      displayOrder: category.displayOrder,
+      thumbnail: category.thumbnail ? strapi.getMediaUrl(category.thumbnail.url) : null,
+      id: category.documentId,
+      // Frontend compatibility - provide the path for navigation
+      path: `/products/${category.slug}`,
+      // Legacy format compatibility
+      files: [], // Will be populated when we integrate products
+      directories: [],
+    }));
+
+    return NextResponse.json(formattedCategories);
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch product categories' },
+      { status: 500 }
+    );
   }
-  
-  return NextResponse.json(result.directories);
 }

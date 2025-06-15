@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
+import { strapi } from '@/lib/strapi';
 
 /**
  * Search API endpoint
- * Searches for products across all categories that match the query
+ * Searches for products across all categories using Strapi
  */
 export async function GET(request: NextRequest) {
   try {
@@ -17,67 +16,55 @@ export async function GET(request: NextRequest) {
         error: 'Search query must be at least 2 characters' 
       }, { status: 400 });
     }
-    
-    // Base directory for products
-    const productsDir = path.join(process.cwd(), 'public', 'images', 'products');
-    
-    // Check if the directory exists
-    if (!fs.existsSync(productsDir)) {
-      return NextResponse.json({ 
-        error: 'Products directory not found' 
-      }, { status: 404 });
+
+    console.log(`Searching for: "${query}"`);
+
+    // Search products using Strapi
+    const products = await strapi.searchProducts(query.trim());
+
+    if (!products || products.length === 0) {
+      return NextResponse.json({
+        query,
+        results: [],
+        total: 0,
+        message: 'No products found matching your search.'
+      });
     }
-    
-    // Get all category directories
-    const categories = fs.readdirSync(productsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-    
-    // Search for matching files in each category
-    const results = [];
-    const normalizedQuery = query.toLowerCase();
-    
-    for (const category of categories) {
-      const categoryDir = path.join(productsDir, category);
-      const files = fs.readdirSync(categoryDir)
-        .filter(file => {
-          // Filter image files only
-          const ext = path.extname(file).toLowerCase();
-          return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-        })
-        .filter(file => {
-          // Match the query against filename (without extension)
-          const fileNameWithoutExt = path.basename(file, path.extname(file)).toLowerCase();
-          return fileNameWithoutExt.includes(normalizedQuery);
-        })
-        .map(file => {
-          // Create result object for each match
-          const relativePath = path.join('products', category, file).replace(/\\/g, '/');
-          return {
-            name: path.basename(file, path.extname(file)),
-            path: `/images/${relativePath}`,
-            category: category,
-            // Add a timestamp to prevent caching (except for MBNA_2025 category)
-            thumbnail: `/api/image?path=${encodeURIComponent(path.join(category, file))}&timestamp=${
-              category === 'MBNA_2025' ? '' : Date.now()
-            }`
-          };
-        });
-      
-      results.push(...files);
-    }
-    
-    // Return search results
-    return NextResponse.json({
-      query: query,
-      count: results.length,
-      results: results
+
+    // Transform products to match frontend expectations
+    const searchResults = products.flatMap(product => {
+      // Get all images for this product
+      const productImages = product.images.map(image => ({
+        name: image.name,
+        path: strapi.getMediaUrl(image.url),
+        alt: image.alternativeText || product.name,
+        productName: product.name,
+        productId: product.documentId,
+        productSlug: product.slug,
+        productDescription: strapi.richTextToPlainText(product.description || []),
+        categories: product.product_categories.map(cat => cat.name).join(', '),
+        categorySlug: product.product_categories[0]?.slug || 'uncategorized',
+        featured: product.featured,
+      }));
+
+      return productImages;
     });
-    
+
+    console.log(`Found ${searchResults.length} images in ${products.length} products for query: "${query}"`);
+
+    return NextResponse.json({
+      query,
+      results: searchResults,
+      total: searchResults.length,
+      productsFound: products.length,
+      message: `Found ${products.length} product(s) with ${searchResults.length} image(s)`
+    });
+
   } catch (error) {
-    console.error('Error searching products:', error);
-    return NextResponse.json({ 
-      error: 'Failed to search products' 
+    console.error('Search error:', error);
+    return NextResponse.json({
+      error: 'Failed to perform search',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

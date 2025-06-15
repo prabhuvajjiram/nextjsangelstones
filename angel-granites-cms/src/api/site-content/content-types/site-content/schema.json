@@ -1,0 +1,65 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_contents",
+  "info": {
+    "singularName": "site-content",
+    "pluralName": "site-contents",
+    "displayName": "SiteContent "
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroTitle": {
+      "type": "string",
+      "maxLength": 200,
+      "required": true
+    },
+    "heroSubtitle": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "audios",
+        "videos"
+      ]
+    },
+    "aboutContent": {
+      "type": "blocks"
+    },
+    "contactEmail": {
+      "type": "email",
+      "required": true
+    },
+    "contactPhone": {
+      "type": "string",
+      "required": true
+    },
+    "contactAddress": {
+      "type": "blocks"
+    },
+    "businessHours": {
+      "type": "blocks"
+    },
+    "testimonials": {
+      "type": "json"
+    },
+    "socialLinks": {
+      "type": "json"
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "seoDescription": {
+      "type": "string",
+      "maxLength": 200
+    }
+  }
+}

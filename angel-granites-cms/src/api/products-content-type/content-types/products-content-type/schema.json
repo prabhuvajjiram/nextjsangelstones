@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products_content_types",
+  "info": {
+    "singularName": "products-content-type",
+    "pluralName": "products-content-types",
+    "displayName": "ProductsContentType"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "product_categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product-category.product-category",
+      "inversedBy": "products_content_types"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "specifications": {
+      "type": "json"
+    },
+    "dimensions": {
+      "type": "string"
+    },
+    "material": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean",
+      "required": true
+    },
+    "displayOrder": {
+      "type": "integer",
+      "required": true
+    }
+  }
+}

@@ -1,46 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { strapi } from '@/lib/strapi';
 
 interface RouteContext {
   params: Promise<{ category: string }>;
-}
-
-async function getProductImages(category: string) {
-  const categoryValue = category.trim();
-  const publicDir = path.join(process.cwd(), 'public');
-  const imagesDir = path.join(publicDir, 'images');
-  const categoryDir = path.join(imagesDir, 'products', categoryValue);
-  
-  console.log('API Route - Category directory path:', categoryDir);
-
-  if (!fs.existsSync(categoryDir)) {
-    console.error(`API Route - Category directory not found: ${categoryDir}`);
-    return NextResponse.json({ 
-      error: 'Category not found',
-      searchedPath: categoryDir 
-    }, { status: 404 });
-  }
-
-  const files = fs.readdirSync(categoryDir);
-  console.log(`API Route - Found ${files.length} files in category ${categoryValue}`);
-  
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-  const images = files
-    .filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return imageExtensions.includes(ext);
-    })
-    .map(file => {
-      const relativePath = path.join('products', categoryValue, file).replace(/\\/g, '/');
-      return {
-        name: file,
-        path: `/images/${relativePath}`
-      };
-    });
-  
-  console.log(`API Route - Returning ${images.length} images for category ${categoryValue}`);
-  return NextResponse.json({ images });
 }
 
 export async function GET(
@@ -49,18 +11,48 @@ export async function GET(
 ) {
   try {
     const { category } = await context.params;
-    
-    if (!category) {
-      console.error('API Route - Category is required but was not provided');
-      return NextResponse.json({ error: 'Category is required' }, { status: 400 });
+    console.log(`Fetching products for category: ${category}`);
+
+    // Fetch products from Strapi by category
+    const { products } = await strapi.getProducts({ category });
+
+    if (!products || products.length === 0) {
+      return NextResponse.json({ 
+        error: 'No products found in this category',
+        category,
+        images: []
+      }, { status: 404 });
     }
 
-    return await getProductImages(category);
+    // Transform products to match frontend expectations
+    const images = products.flatMap(product => 
+      product.images.map(image => ({
+        name: image.name,
+        path: strapi.getMediaUrl(image.url),
+        alt: image.alternativeText || product.name,
+        productName: product.name,
+        productId: product.documentId,
+        productSlug: product.slug,
+      }))
+    );
+
+    console.log(`Found ${images.length} images in ${products.length} products for category ${category}`);
+
+    return NextResponse.json({
+      category,
+      images,
+      totalProducts: products.length,
+      totalImages: images.length
+    });
+
   } catch (error) {
-    console.error('API Route - Error fetching product images:', error);
-    return NextResponse.json({ 
-      error: 'Failed to fetch product images',
-      message: error instanceof Error ? error.message : String(error)
-    }, { status: 500 });
+    console.error('Error fetching products by category:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to fetch products',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 }

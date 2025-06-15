@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projectscontenttypes",
+  "info": {
+    "singularName": "projectscontenttype",
+    "pluralName": "projectscontenttypes",
+    "displayName": " Projectscontenttype"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "maxLength": 200,
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "blocks",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "monuments",
+        "memorials",
+        "custom",
+        "commercial",
+        "headstones",
+        "mausoleum",
+        "columbarium",
+        "vases"
+      ]
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "completionDate": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "tags": {
+      "type": "json"
+    },
+    "clientName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "displayOrder": {
+      "type": "integer",
+      "required": true,
+      "default": 0
+    }
+  }
+}

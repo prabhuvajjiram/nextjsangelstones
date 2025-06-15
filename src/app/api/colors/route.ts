@@ -1,39 +1,38 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
+import { strapi } from '@/lib/strapi';
 
 interface ColorImage {
   name: string;
   path: string;
   category: string;
+  hexCode?: string;
+  available?: boolean;
 }
 
 export async function GET() {
   try {
-    // Get the colors directory path
-    const colorsDir = path.join(process.cwd(), 'public', 'images', 'colors');
+    // Fetch color varieties from Strapi
+    const colorVarieties = await strapi.getColorVarieties();
     
-    // Get all image files in the colors directory
-    const files = fs.readdirSync(colorsDir);
-    
-    // Filter only image files
-    const images = files.filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
-    });
-
-    // Create color images data
-    const colorImages: ColorImage[] = images.map(file => ({
-      name: path.basename(file, path.extname(file)).replace(/-/g, ' '),
-      path: file,
-      category: 'colors'
+    // Transform to match the expected format for your frontend
+    const colorImages: ColorImage[] = colorVarieties.map(color => ({
+      name: color.name,
+      path: color.thumbnail ? strapi.getMediaUrl(color.thumbnail.url) : `/images/colors/${color.slug}.jpg`,
+      category: 'colors',
+      hexCode: color.hexCode,
+      available: color.available,
+      // Additional properties for enhanced functionality
+      slug: color.slug,
+      id: color.documentId,
+      description: strapi.richTextToPlainText(color.description || []),
+      displayOrder: color.displayOrder,
     }));
 
     return NextResponse.json(colorImages);
   } catch (error) {
-    console.error('Error fetching color images:', error);
+    console.error('Error fetching color varieties:', error);
     return NextResponse.json(
-      { error: 'Failed to load color images. Please try again later.' },
+      { error: 'Failed to fetch color varieties' },
       { status: 500 }
     );
   }
