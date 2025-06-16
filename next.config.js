@@ -20,7 +20,24 @@ const nextConfig = {
   
   // Enable image optimization with proper configuration
   images: {
+    // Enable optimization
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    
+    // Remote patterns for Strapi uploads (replaces deprecated domains)
     remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '1337',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'strapi.angelgranites.com',
+        pathname: '/uploads/**',
+      },
       {
         protocol: 'http',
         hostname: 'localhost',
@@ -32,24 +49,40 @@ const nextConfig = {
         pathname: '/**',
       }
     ],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    
+    // Image optimization
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
     dangerouslyAllowSVG: true,
-    contentDispositionType: 'inline',
-    contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
+  // Compression
+  compress: true,
   
   // Enable performance optimizations
   experimental: {
     // Enable newer React optimizations
-    optimizePackageImports: ['@headlessui/react']
+    optimizePackageImports: ['@headlessui/react'],
+    optimizeCss: true,
+    optimizeServerReact: true,
   },
   
   // Configure headers for better security and performance
   async headers() {
     return [
+      {
+        source: '/api/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=604800',
+          },
+          {
+            key: 'Vary',
+            value: 'Accept',
+          },
+        ],
+      },
       {
         source: '/(.*)',
         headers: [
@@ -64,6 +97,10 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
           },
         ],
       },
@@ -85,44 +122,14 @@ const nextConfig = {
     return [];
   },
 
-  webpack(config, { dev, isServer }) {
-    // Add optimization for third-party modules
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
-    };
-
-    // Add proper module resolution
-    config.resolve = {
-      ...config.resolve,
-      fallback: {
+  webpack: (config, { isServer }) => {
+    // Optimize bundle size
+    if (!isServer) {
+      config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         net: false,
         tls: false,
-        path: false,
-      },
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-    };
-
-    // Using Next.js built-in image optimization instead of image-webpack-loader
-
-    // Only run in production builds
-    if (!dev) {
-      // Split large chunks for better loading
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        maxInitialRequests: 25,
-        minSize: 20000,
       };
     }
 

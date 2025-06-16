@@ -126,6 +126,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-primary-200 focus:border-accent-400 focus:ring focus:ring-accent-100 outline-none transition-all duration-200"
+                    suppressHydrationWarning={true}
                   />
                 </div>
                 <div>
@@ -140,6 +141,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-primary-200 focus:border-accent-400 focus:ring focus:ring-accent-100 outline-none transition-all duration-200"
+                    suppressHydrationWarning={true}
                   />
                 </div>
               </div>
@@ -156,6 +158,7 @@ export default function ContactSection() {
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-primary-200 focus:border-accent-400 focus:ring focus:ring-accent-100 outline-none transition-all duration-200"
+                    suppressHydrationWarning={true}
                   />
                 </div>
                 <div>
@@ -169,6 +172,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-primary-200 focus:border-accent-400 focus:ring focus:ring-accent-100 outline-none transition-all duration-200 bg-white"
+                    suppressHydrationWarning={true}
                   >
                     <option value="">Please select</option>
                     <option value="General Inquiry">General Inquiry</option>
@@ -192,6 +196,7 @@ export default function ContactSection() {
                   rows={5}
                   required
                   className="w-full px-4 py-3 border border-primary-200 focus:border-accent-400 focus:ring focus:ring-accent-100 outline-none transition-all duration-200"
+                  suppressHydrationWarning={true}
                 ></textarea>
               </div>
               
@@ -202,6 +207,7 @@ export default function ContactSection() {
                   className={`btn btn-primary w-full flex items-center justify-center ${
                     formStatus === 'submitting' ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
+                  suppressHydrationWarning={true}
                 >
                   {formStatus === 'submitting' ? (
                     <>

@@ -133,6 +133,7 @@ const ProjectsSection = () => {
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
+              suppressHydrationWarning={true}
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </button>
@@ -183,6 +184,7 @@ const ProjectsSection = () => {
                 onClick={closeModal}
                 className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
                 aria-label="Close modal"
+                suppressHydrationWarning={true}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

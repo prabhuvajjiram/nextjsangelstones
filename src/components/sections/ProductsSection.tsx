@@ -38,10 +38,22 @@ const ProductsSection = () => {
         }
         
         const data = await response.json();
-        setProducts(data);
+        
+        // Ensure data is an array - handle both direct array and object with categories property
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else if (data && Array.isArray(data.categories)) {
+          // Handle API response with categories property
+          setProducts(data.categories);
+        } else {
+          console.warn('Products data is not in expected format:', data);
+          setProducts([]);
+          setError('Invalid product data format');
+        }
       } catch (err) {
         console.error('Failed to fetch products:', err);
         setError('Failed to load product categories. Please try again later.');
+        setProducts([]); // Set empty array as fallback
       } finally {
         setLoading(false);
       }
@@ -137,40 +149,46 @@ const ProductsSection = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {products.map((product, index) => (
-                <div
-                  key={product.id || index}
-                  ref={el => { productRefs.current[index] = el; }}
-                  className="group relative overflow-hidden rounded-lg shadow-luxury transition-all duration-300 hover:scale-105"
-                >
-                  <Link href={product.path}>
-                    <div className="relative h-64 w-full">
-                      <Image
-                        src={product.thumbnail || '/images/placeholder.jpg'}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        quality={80}
-                        priority={index < 3}
-                        onError={(e) => handleImageErrorUtil(e, product.path)}
-                        style={{
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                        }}
-                      />
-                    </div>
-                    <div className="p-6 bg-white">
-                      <h3 className="text-lg font-semibold group-hover:text-accent-700 transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-gray-600 mt-2 line-clamp-2">
-                        {product.description}
-                      </p>
-                    </div>
-                  </Link>
+              {Array.isArray(products) && products.length > 0 ? (
+                products.map((product, index) => (
+                  <div
+                    key={product.id || index}
+                    ref={el => { productRefs.current[index] = el; }}
+                    className="group relative overflow-hidden rounded-lg shadow-luxury transition-all duration-300 hover:scale-105"
+                  >
+                    <Link href={product.path}>
+                      <div className="relative h-64 w-full">
+                        <Image
+                          src={product.thumbnail || '/images/placeholder.jpg'}
+                          alt={product.name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          quality={80}
+                          priority={index < 3}
+                          onError={(e) => handleImageErrorUtil(e, product.path)}
+                          style={{
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                          }}
+                        />
+                      </div>
+                      <div className="p-6 bg-white">
+                        <h3 className="text-lg font-semibold group-hover:text-accent-700 transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-gray-600 mt-2 line-clamp-2">
+                          {product.description}
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-gray-600">No products found.</p>
                 </div>
-              ))}
+              )}
             </div>
             <div className="mt-16" ref={colorsRef}>
               {showColors && <LazyColorsSection />}

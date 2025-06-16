@@ -17,4 +17,9 @@ export default ({ env }) => ({
     nps: env.bool('FLAG_NPS', true),
     promoteEE: env.bool('FLAG_PROMOTE_EE', false), // Disable Enterprise promotion
   },
+  vite: {
+    optimizeDeps: {
+      exclude: ['Login', 'constants'], // Add any problematic files mentioned in your error
+    },
+  },
 });
